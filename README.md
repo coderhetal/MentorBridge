@@ -11,7 +11,7 @@
  
 MentorBridge is a peer mentorship platform built for JEE aspirants. Students fill a short Google Form describing their challenges, target, and availability. The team personally reviews every submission and matches each student with a verified IIT/NIT senior mentor for a one-on-one call.
  
-No app downloads. No subscriptions. No algorithm deciding your match — just a human review and a real conversation.
+No app downloads. No subscriptions. Just a real conversation.
  
 Started by **VNIT Nagpur '25 alumni** who knew that what most JEE students are missing isn't content — it's *clarity from someone who's actually been there.* All mentors contribute voluntarily. There is no commercial interest behind this platform.
  
