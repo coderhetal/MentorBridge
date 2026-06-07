@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dhaaraa — Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F2EE;--surface:#FFFFFF;--surface2:#F9F7F4;
+  --border:#E2DDD7;--border2:#D0CAC2;
+  --text:#1A1714;--text2:#6B6560;--text3:#9E9892;
+  --orange:#C85A1A;--orange-l:#E07040;--orange-bg:#FBF0EB;--orange-border:#F0C9B0;
+  --green:#1A7A45;--green-l:#22A05A;--green-bg:#EBF5EF;--green-border:#A8D9BC;
+  --blue:#1A5FA0;--blue-l:#2478C8;--blue-bg:#EBF3FB;--blue-border:#A8CCEA;
+  --yellow:#8A6200;--yellow-bg:#FBF5E0;--yellow-border:#E8D080;
+  --purple:#5A3A9A;--purple-bg:#F2EDFC;--purple-border:#C8B0E8;
+  --red:#A01A1A;--red-bg:#FBEDED;--red-border:#E8AAAA;
+  --font:'DM Sans',system-ui,sans-serif;
+  --serif:'Instrument Serif',Georgia,serif;
+  --r:8px;--rl:12px;--rxl:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow:hidden;font-size:14px}
+
+header{height:54px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  position:fixed;top:0;left:0;right:0;z-index:200;box-shadow:var(--shadow)}
+.logo{font-family:var(--serif);font-size:18px;color:var(--text);letter-spacing:-.01em}
+.logo em{color:var(--orange);font-style:italic}
+.logo-sub{font-family:var(--font);font-size:11px;font-weight:400;color:var(--text3);margin-left:8px;letter-spacing:.02em;text-transform:uppercase}
+.hright{display:flex;align-items:center;gap:10px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text3)}
+.status-dot.on{background:var(--green-l)}
+.status-txt{font-size:11px;color:var(--text3)}
+.badge{font-size:10px;font-weight:500;padding:3px 8px;border-radius:100px;border:1px solid;letter-spacing:.03em;text-transform:uppercase}
+.badge-green{color:var(--green);background:var(--green-bg);border-color:var(--green-border)}
+.badge-blue{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-border)}
+
+.app{display:flex;height:calc(100vh - 54px);margin-top:54px}
+
+.sidebar{width:200px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:12px 0;overflow-y:auto}
+.sb-section{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);
+  padding:10px 16px 4px}
+.sb-btn{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:13px;font-weight:400;
+  color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;
+  width:100%;text-align:left;font-family:var(--font);border-radius:0}
+.sb-btn:hover{color:var(--text);background:var(--bg)}
+.sb-btn.active{color:var(--orange);background:var(--orange-bg);font-weight:500;
+  border-right:2px solid var(--orange)}
+.sb-icon{font-size:14px;width:18px;text-align:center;opacity:.7}
+.sb-div{height:1px;background:var(--border);margin:6px 0}
+.sb-bottom{margin-top:auto;padding:12px}
+.fb-box{background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:var(--r);padding:10px;margin-top:8px}
+.fb-label{font-size:10px;font-weight:500;color:var(--orange);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.fb-input{width:100%;padding:5px 7px;border-radius:6px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:11px;font-family:var(--font);outline:none;margin-bottom:6px}
+.fb-input:focus{border-color:var(--orange)}
+.fb-input:last-of-type{margin-bottom:0}
+
+.content{flex:1;overflow-y:auto;padding:24px;max-width:100%}
+.page{display:none}.page.active{display:block}
+.page-header{margin-bottom:20px}
+.page-title{font-family:var(--serif);font-size:22px;color:var(--text);margin-bottom:3px}
+.page-sub{font-size:13px;color:var(--text3)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.card-sub{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5}
+
+.alert{border-radius:var(--r);padding:10px 14px;margin-bottom:12px;font-size:12px;line-height:1.6;display:flex;gap:8px;align-items:flex-start}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.alert-green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.alert-blue{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue)}
+.alert-yellow{background:var(--yellow-bg);border:1px solid var(--yellow-border);color:var(--yellow)}
+.alert-orange{background:var(--orange-bg);border:1px solid var(--orange-border);color:var(--orange)}
+.alert-purple{background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple)}
+.alert strong{color:inherit}
+
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--rl);padding:24px 16px;
+  text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--surface)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--orange);background:var(--orange-bg)}
+.upload-zone.done{border-color:var(--green-l);border-style:solid;background:var(--green-bg)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-icon{font-size:24px;margin-bottom:8px}
+.uz-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.uz-sub{font-size:11px;color:var(--text3)}
+.uz-status{margin-top:6px;font-size:11px;font-weight:500}
+.uz-ok{color:var(--green)}.uz-err{color:var(--red)}
+
+.btn{padding:8px 16px;border-radius:100px;font-family:var(--font);font-size:12px;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-primary{background:var(--orange);color:#fff}.btn-primary:hover{background:var(--orange-l)}
+.btn-secondary{background:var(--surface);color:var(--text2);border:1px solid var(--border)}.btn-secondary:hover{background:var(--bg);color:var(--text)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-l)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-l)}
+.btn-warn{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}.btn-warn:hover{background:var(--yellow-border)}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+
+.wf-steps{display:flex;gap:0;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow)}
+.wf-step{flex:1;padding:10px 8px;font-size:12px;font-weight:400;text-align:center;border:none;
+  background:none;color:var(--text3);cursor:pointer;font-family:var(--font);transition:all .15s;
+  border-right:1px solid var(--border)}
+.wf-step:last-child{border-right:none}
+.wf-step:hover{color:var(--text);background:var(--bg)}
+.wf-step.done{color:var(--green);background:var(--green-bg)}
+.wf-step.current{color:var(--orange);background:var(--orange-bg);font-weight:500}
+.wf-panel{display:none}.wf-panel.active{display:block}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;box-shadow:var(--shadow)}
+.stat-num{font-family:var(--serif);font-size:26px;margin-bottom:2px}
+.stat-label{font-size:11px;color:var(--text3)}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{padding:8px 10px;text-align:left;color:var(--text3);font-weight:500;
+  border-bottom:1px solid var(--border);background:var(--surface2);font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.status-pill{font-size:9px;font-weight:600;padding:2px 7px;border-radius:100px;letter-spacing:.04em;text-transform:uppercase;border:1px solid;white-space:nowrap}
+.s-pending{color:var(--yellow);background:var(--yellow-bg);border-color:var(--yellow-border)}
+.s-matched{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-border)}
+.s-session_done{color:var(--green);background:var(--green-bg);border-color:var(--green-border)}
+.s-feedback_received{color:var(--orange);background:var(--orange-bg);border-color:var(--orange-border)}
+.s-completed{color:var(--text3);background:var(--bg);border-color:var(--border)}
+
+.match-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px 18px;box-shadow:var(--shadow)}
+.match-nav-info{font-size:12px;color:var(--text3)}
+.match-nav-count{font-family:var(--serif);font-size:20px;color:var(--text)}
+.student-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);
+  padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.student-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:500;color:#fff;flex-shrink:0}
+.student-meta{flex:1}
+.student-name{font-family:var(--serif);font-size:17px;color:var(--text);margin-bottom:2px}
+.student-info-row{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3)}
+.info-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);
+  background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:2px 8px}
+.challenge-box{background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--orange);
+  border-radius:var(--r);padding:10px 12px;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.6}
+.challenge-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px}
+
+.mentor-options-label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px}
+.mentor-option{border:1.5px solid var(--border);border-radius:var(--rl);padding:14px;cursor:pointer;
+  transition:all .18s;background:var(--surface);margin-bottom:10px}
+.mentor-option:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.mentor-option.selected{border-color:var(--green);background:var(--green-bg)}
+.mentor-option.repeat-opt{border-color:var(--purple-border)}
+.mentor-option.repeat-opt.selected{border-color:var(--purple);background:var(--purple-bg)}
+.opt-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px}
+.opt-left{flex:1}
+.opt-rank-badge{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:100px;border:1px solid}
+.rank-1{color:var(--green);background:var(--green-bg);border-color:var(--green-border)}
+.rank-2{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-border)}
+.rank-3{color:var(--yellow);background:var(--yellow-bg);border-color:var(--yellow-border)}
+.rank-repeat{color:var(--purple);background:var(--purple-bg);border-color:var(--purple-border)}
+.opt-score{font-family:var(--serif);font-size:22px;font-weight:400;min-width:52px;text-align:right}
+.opt-mentor-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px}
+.opt-mentor-sub{font-size:12px;color:var(--text3);margin-bottom:8px}
+
+.admin-details{background:var(--orange-bg);border:1px solid var(--orange-border);border-radius:var(--r);
+  padding:10px 12px;margin-bottom:10px}
+.admin-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--orange);margin-bottom:7px;display:flex;align-items:center;gap:4px}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.admin-row{font-size:11px}
+.admin-key{color:var(--text3);margin-bottom:1px}
+.admin-val{color:var(--text);font-weight:500}
+
+.timing-suggestion{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--r);
+  padding:10px 12px;margin-bottom:10px}
+.timing-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--blue);margin-bottom:7px}
+.timing-chips{display:flex;gap:6px;flex-wrap:wrap}
+.timing-chip{font-size:11px;font-weight:500;color:var(--blue);background:var(--surface);
+  border:1px solid var(--blue-border);border-radius:100px;padding:3px 10px}
+
+.score-bars{margin-bottom:10px}
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.score-key{font-size:10px;color:var(--text3);width:48px;flex-shrink:0}
+.score-bar-bg{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.score-val{font-size:10px;font-weight:500;min-width:28px;text-align:right}
+.score-total-row{display:flex;align-items:center;gap:8px;padding-top:6px;border-top:1px solid var(--border);margin-top:4px}
+.score-total-key{font-size:11px;font-weight:500;color:var(--text);width:48px;flex-shrink:0}
+.score-total-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+
+.reasons{margin-top:8px}
+.reason-item{display:flex;gap:5px;font-size:11px;line-height:1.5;margin-bottom:3px}
+.reason-good{color:var(--green)}.reason-ok{color:var(--blue)}.reason-warn{color:var(--yellow)}
+.warn-item{display:flex;gap:5px;font-size:11px;line-height:1.5;margin-bottom:3px;color:var(--yellow)}
+
+.override-section{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.override-label{font-size:11px;font-weight:500;color:var(--text3);margin-bottom:8px}
+.override-row{display:flex;gap:8px;align-items:center}
+
+.meet-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.meet-section-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:10px}
+.meet-input-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.meet-input{flex:1;padding:7px 10px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-family:var(--font);font-size:12px;outline:none}
+.meet-input:focus{border-color:var(--green)}
+.timing-note{font-size:11px;color:var(--text3);line-height:1.5;padding:8px;background:var(--bg);border-radius:var(--r)}
+
+.email-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.email-tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.email-tab{padding:6px 12px;font-size:11px;font-weight:500;cursor:pointer;color:var(--text3);
+  border:none;background:none;font-family:var(--font);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s}
+.email-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.email-body{font-size:11px;color:var(--text2);line-height:1.7;white-space:pre-wrap;
+  max-height:200px;overflow-y:auto;background:var(--bg);border-radius:var(--r);padding:10px 12px;font-family:'Courier New',monospace}
+.email-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+/* CONFIRMED LIST */
+.confirmed-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);
+  padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.confirmed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.confirmed-names{font-size:14px;font-weight:500;color:var(--text)}
+.confirmed-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.confirmed-saved-badge{font-size:10px;font-weight:500;color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-border);padding:3px 9px;border-radius:100px}
+/* meet link row in confirmed */
+.conf-meet-row{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:12px;
+  background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r)}
+.conf-meet-row label{font-size:11px;font-weight:600;color:var(--green);white-space:nowrap}
+.conf-meet-inp{flex:1;padding:6px 9px;border-radius:6px;border:1px solid var(--green-border);
+  background:var(--surface);color:var(--text);font-family:var(--font);font-size:12px;outline:none}
+.conf-meet-inp:focus{border-color:var(--green)}
+.confirmed-emails{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.email-panel{border:1px solid var(--border);border-radius:var(--r);padding:10px;background:var(--bg)}
+.email-panel-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.email-panel-body{font-size:10px;color:var(--text3);line-height:1.7;white-space:pre-wrap;max-height:130px;overflow-y:auto;font-family:'Courier New',monospace}
+.email-panel-actions{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+
+/* DB-sourced confirmed items have a slightly different accent */
+.confirmed-item.from-db{border-left:3px solid var(--blue)}
+
+/* change match banner */
+.change-match-bar{background:var(--yellow-bg);border:1px solid var(--yellow-border);border-radius:var(--r);
+  padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.change-match-txt{font-size:12px;color:var(--yellow)}
+
+.loading{text-align:center;padding:40px;display:none}
+.loading.show{display:block}
+.spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--orange);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--rxl);
+  width:min(680px,95vw);max-height:88vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow-md)}
+.modal-title{font-family:var(--serif);font-size:18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer}
+.modal-close:hover{color:var(--text)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-section{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.modal-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px}
+.modal-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
+.modal-row:last-child{border-bottom:none}
+.modal-row .key{color:var(--text3)}
+.modal-row .val{color:var(--text);text-align:right}
+
+.toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;
+  padding:9px 18px;border-radius:100px;font-size:12px;font-weight:500;z-index:999;
+  transform:translateY(50px);transition:transform .25s;pointer-events:none;box-shadow:var(--shadow-md)}
+.toast.show{transform:translateY(0)}
+.toast.warn{background:var(--orange)}
+
+select,input[type=text],input[type=date],input[type=url],textarea{
+  padding:6px 10px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--surface);color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .15s}
+select:focus,input:focus,textarea:focus{border-color:var(--orange)}
+select{appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239E9892' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+
+.ml-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.ml-row:last-child{border-bottom:none}
+.ml-name{font-size:12px;font-weight:500;min-width:130px;flex-shrink:0}
+.ml-bar-wrap{flex:1}
+.ml-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.ml-fill{height:100%;border-radius:3px;background:var(--orange)}
+.ml-meta{font-size:11px;color:var(--text3)}
+
+.ms-iit{color:var(--green);background:var(--green-bg);border-color:var(--green-border)}
+.ms-adv{color:var(--yellow);background:var(--yellow-bg);border-color:var(--yellow-border)}
+.ms-mains{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-border)}
+.ms-other{color:var(--text3);background:var(--bg);border-color:var(--border)}
+
+@media(max-width:700px){
+  .sidebar{display:none}
+  .upload-grid,.dash-grid,.stats-grid,.modal-grid,.confirmed-emails{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<header>
+  <div style="display:flex;align-items:center;gap:6px">
+    <div class="logo">Dhaar<em>aa</em></div>
+    <span class="logo-sub">Admin Portal</span>
+  </div>
+  <div class="hright">
+    <span class="badge badge-green">Local only</span>
+    <span class="badge badge-blue">IndexedDB</span>
+    <div style="display:flex;align-items:center;gap:5px">
+      <div class="status-dot" id="dbDot"></div>
+      <span class="status-txt" id="dbSt">Connecting...</span>
+    </div>
+  </div>
+</header>
+
+<div class="app">
+<div class="sidebar">
+  <div class="sb-section">Overview</div>
+  <button class="sb-btn active" onclick="nav('dashboard')"><span class="sb-icon">◉</span>Dashboard</button>
+  <button class="sb-btn" onclick="nav('records')"><span class="sb-icon">≡</span>All Records</button>
+  <div class="sb-div"></div>
+  <div class="sb-section">Matching</div>
+  <button class="sb-btn" onclick="nav('matching')"><span class="sb-icon">⇌</span>Match Students</button>
+  <button class="sb-btn" onclick="nav('confirmed')"><span class="sb-icon">✓</span>Confirmed Matches</button>
+  <div class="sb-div"></div>
+  <div class="sb-section">Profiles</div>
+  <button class="sb-btn" onclick="nav('profiles')"><span class="sb-icon">▣</span>Student & Mentor Data</button>
+  <div class="sb-div"></div>
+  <div class="sb-section">Feedback</div>
+  <button class="sb-btn" onclick="nav('feedback')"><span class="sb-icon">★</span>Upload Feedback</button>
+  <div class="sb-div"></div>
+  <div class="sb-section">Analysis</div>
+  <button class="sb-btn" onclick="nav('mentorload')"><span class="sb-icon">⬡</span>Mentor Load</button>
+  <div class="sb-div"></div>
+  <div class="sb-section">Data</div>
+  <button class="sb-btn" onclick="exportExcel()"><span class="sb-icon">↓</span>Export Excel</button>
+  <button class="sb-btn" onclick="triggerImport()"><span class="sb-icon">↑</span>Import Excel</button>
+  <input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importExcel(event)"/>
+  <div class="sb-bottom">
+    <div class="fb-box">
+      <label class="fb-label">Student feedback URL</label>
+      <input class="fb-input" type="url" id="fbStudent" placeholder="https://forms.gle/..." oninput="saveSetting('fbStudent',this.value)"/>
+      <label class="fb-label">Mentor feedback URL</label>
+      <input class="fb-input" type="url" id="fbMentor" placeholder="https://forms.gle/..." oninput="saveSetting('fbMentor',this.value)"/>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- DASHBOARD -->
+<div class="page active" id="pg-dashboard">
+  <div class="page-header">
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Live overview — auto-updates as you work</div>
+  </div>
+  <div class="stats-grid" id="dashStats"></div>
+  <div class="dash-grid">
+    <div class="card" style="margin-bottom:0"><div class="card-title">Recent activity</div><div id="recentAct" style="font-size:12px;color:var(--text3)">Loading...</div></div>
+    <div class="card" style="margin-bottom:0"><div class="card-title">Pending actions</div><div id="pendingAct" style="font-size:12px;color:var(--text3)">Loading...</div></div>
+  </div>
+</div>
+
+<!-- RECORDS -->
+<div class="page" id="pg-records">
+  <div class="page-header">
+    <div class="page-title">All Records</div>
+    <div class="page-sub">Click any row to see full details · editable inline</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <select id="filterStatus" onchange="renderRecords()">
+      <option value="">All statuses</option>
+      <option value="pending">Pending</option>
+      <option value="matched">Matched</option>
+      <option value="session_done">Session done</option>
+      <option value="feedback_received">Feedback received</option>
+      <option value="completed">Completed</option>
+    </select>
+    <input type="text" id="searchRec" placeholder="Search name or mentor..." oninput="renderRecords()" style="flex:1;min-width:120px"/>
+    <button class="btn btn-primary btn-sm" onclick="exportExcel()">↓ Export</button>
+    <button class="btn btn-secondary btn-sm" onclick="clearAllRecs()">Clear all</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th><th>Student</th><th>Class</th><th>Mentor</th><th>Milestone</th><th>Score</th>
+        <th>Sessions</th><th>Session date</th><th>Status</th><th>S.Rating</th><th>M.Rating</th><th></th>
+      </tr></thead>
+      <tbody id="recBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MATCHING -->
+<div class="page" id="pg-matching">
+  <div class="page-header">
+    <div class="page-title">Match Students</div>
+    <div class="page-sub">Upload files → review matches one-by-one → confirm and send</div>
+  </div>
+  <div class="wf-steps">
+    <button class="wf-step current" id="wfs1" onclick="wfGo(1)">1 · Upload files</button>
+    <button class="wf-step" id="wfs2" onclick="wfGo(2)">2 · Configure batch</button>
+    <button class="wf-step" id="wfs3" onclick="wfGo(3)">3 · Review & match</button>
+    <button class="wf-step" id="wfs4" onclick="wfGo(4)">4 · Email & send</button>
+  </div>
+
+  <div class="wf-panel active" id="wf1">
+    <div class="alert alert-green"><span class="alert-icon">🔒</span><div><strong>100% private.</strong> All data stays in your browser only. Nothing is uploaded or sent anywhere.</div></div>
+    <div class="alert alert-blue"><span class="alert-icon">⚙</span><div><strong>Algorithm:</strong> TF-IDF skill match (30%) + Milestone (25%) + Day availability (17%) + Time slot (8%) + Domain overlap (10%) + Feedback reputation (5%) + Capacity (5%)</div></div>
+    <div class="upload-grid">
+      <div class="upload-zone" id="sz" ondragover="dov(event,'sz')" ondragleave="dlv('sz')" ondrop="drp(event,'s')">
+        <input type="file" accept=".xlsx,.xls,.csv" onchange="lf(event,'s')"/>
+        <div class="uz-icon">📋</div><div class="uz-title">Student responses</div>
+        <div class="uz-sub">Drop .xlsx / .csv or click</div><div class="uz-status" id="ss2"></div>
+      </div>
+      <div class="upload-zone" id="mz" ondragover="dov(event,'mz')" ondragleave="dlv('mz')" ondrop="drp(event,'m')">
+        <input type="file" accept=".xlsx,.xls,.csv" onchange="lf(event,'m')"/>
+        <div class="uz-icon">👨‍🏫</div><div class="uz-title">Mentor responses</div>
+        <div class="uz-sub">Drop .xlsx / .csv or click</div><div class="uz-status" id="ms2"></div>
+      </div>
+    </div>
+    <div id="uploadPrev"></div>
+    <div class="btn-row"><button class="btn btn-primary" id="toStep2Btn" onclick="wfGo(2)" disabled>Next — configure →</button></div>
+  </div>
+
+  <div class="wf-panel" id="wf2">
+    <div class="alert alert-blue"><span class="alert-icon">ℹ</span><div>Review loaded data and give this batch a name before running matching.</div></div>
+    <div class="card">
+      <div class="card-title">Batch name <span style="font-weight:400;color:var(--text3)">(optional)</span></div>
+      <input type="text" id="batchName" placeholder="e.g. Batch 1 — July 2025" style="width:100%;max-width:360px;margin-top:8px"/>
+    </div>
+    <div id="wf2Preview"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="wfGo(1)">← Back</button>
+      <button class="btn btn-primary" onclick="wfGo(3);runMatch()">✦ Run matching →</button>
+    </div>
+  </div>
+
+  <div class="wf-panel" id="wf3">
+    <div class="loading" id="ml"><div class="spinner"></div><p style="font-size:12px;color:var(--text3)">Running enhanced matching algorithm...</p></div>
+    <div id="matchWrap"></div>
+  </div>
+
+  <div class="wf-panel" id="wf4">
+    <div id="sendList"></div>
+  </div>
+</div>
+
+<!-- CONFIRMED MATCHES — now loads from DB + session -->
+<div class="page" id="pg-confirmed">
+  <div class="page-header">
+    <div class="page-title">Confirmed Matches</div>
+    <div class="page-sub">All saved matches · paste a Meet link for any pair to regenerate emails</div>
+  </div>
+  <div id="confirmedList"></div>
+</div>
+
+<!-- PROFILES -->
+<div class="page" id="pg-profiles">
+  <div class="page-header">
+    <div class="page-title">Student & Mentor Profiles</div>
+    <div class="page-sub">All data from uploaded files · deduplicated</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-primary btn-sm" id="profTabS" onclick="switchProfTab('students')">Students</button>
+    <button class="btn btn-secondary btn-sm" id="profTabM" onclick="switchProfTab('mentors')">Mentors</button>
+    <input type="text" id="profSearch" placeholder="Search by name, email, college..." oninput="renderProfiles()" style="flex:1;min-width:140px"/>
+    <button class="btn btn-secondary btn-sm" onclick="clearProfiles()">Clear profiles</button>
+  </div>
+  <div id="profContent"></div>
+</div>
+
+<!-- FEEDBACK -->
+<div class="page" id="pg-feedback">
+  <div class="page-header">
+    <div class="page-title">Upload Feedback</div>
+    <div class="page-sub">Match feedback to records by student + mentor name</div>
+  </div>
+  <div class="alert alert-purple"><span class="alert-icon">⭐</span><div><strong>Smart merge:</strong> Matched by student + mentor name. Safe to re-upload the same file.</div></div>
+  <div class="upload-grid">
+    <div class="upload-zone" id="fbs" ondragover="dov(event,'fbs')" ondragleave="dlv('fbs')" ondrop="drp(event,'fs')">
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="lf(event,'fs')"/>
+      <div class="uz-icon">🎓</div><div class="uz-title">Student feedback</div>
+      <div class="uz-sub">Filled by students about their mentor</div><div class="uz-status" id="fss"></div>
+    </div>
+    <div class="upload-zone" id="fbm" ondragover="dov(event,'fbm')" ondragleave="dlv('fbm')" ondrop="drp(event,'fm')">
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="lf(event,'fm')"/>
+      <div class="uz-icon">👨‍🏫</div><div class="uz-title">Mentor feedback</div>
+      <div class="uz-sub">Filled by mentors about their mentee</div><div class="uz-status" id="fms"></div>
+    </div>
+  </div>
+  <div class="btn-row"><button class="btn btn-primary" onclick="processFeedback()">⭐ Process and save feedback →</button></div>
+  <div id="fbResult"></div>
+</div>
+
+<!-- MENTOR LOAD -->
+<div class="page" id="pg-mentorload">
+  <div class="page-header">
+    <div class="page-title">Mentor Load</div>
+    <div class="page-sub">Assignment counts, sessions done, average ratings</div>
+  </div>
+  <div id="mentorAnalysis"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+// ══════════════════════════════
+// INDEXEDDB
+// ══════════════════════════════
+const DB_NAME='DhaaraaDB2',DB_VER=1;
+let db=null;
+
+function initDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('records')){
+        const s=d.createObjectStore('records',{keyPath:'id'});
+        s.createIndex('status','status',{unique:false});
+      }
+      if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'key'});
+      if(!d.objectStoreNames.contains('students')){d.createObjectStore('students',{keyPath:'id'})}
+      if(!d.objectStoreNames.contains('mentors')){d.createObjectStore('mentors',{keyPath:'id'})}
+    };
+    req.onsuccess=e=>{
+      db=e.target.result;
+      document.getElementById('dbDot').classList.add('on');
+      document.getElementById('dbSt').textContent='Ready';
+      res(db);
+    };
+    req.onerror=()=>rej(req.error);
+  });
+}
+function txs(s,m='readonly'){return db.transaction(s,m).objectStore(s)}
+function dbGet(s,k){return new Promise((r,j)=>{const q=txs(s).get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
+function dbPut(s,o){return new Promise((r,j)=>{const q=txs(s,'readwrite').put(o);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
+function dbDelete(s,k){return new Promise((r,j)=>{const q=txs(s,'readwrite').delete(k);q.onsuccess=()=>r();q.onerror=()=>j(q.error)})}
+function dbGetAll(s){return new Promise((r,j)=>{const q=txs(s).getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>j(q.error)})}
+function dbClear(s){return new Promise((r,j)=>{const q=txs(s,'readwrite').clear();q.onsuccess=()=>r();q.onerror=()=>j(q.error)})}
+async function getAllRecords(){return await dbGetAll('records')}
+async function updateRec(id,updates){const r=await dbGet('records',id);if(r){await dbPut('records',{...r,...updates});refreshAll()}}
+async function deleteRec(id){await dbDelete('records',id);refreshAll()}
+async function clearAllRecs(){if(!confirm('Clear all records?'))return;await dbClear('records');refreshAll();toast('Records cleared')}
+async function saveSetting(k,v){await dbPut('settings',{key:k,value:v})}
+async function getSetting(k){const r=await dbGet('settings',k);return r?r.value:''}
+async function loadSettings(){
+  const fs=await getSetting('fbStudent');if(fs)document.getElementById('fbStudent').value=fs;
+  const fm=await getSetting('fbMentor');if(fm)document.getElementById('fbMentor').value=fm;
+}
+function refreshAll(){
+  renderDashboard();
+  const active=document.querySelector('.page.active')?.id;
+  if(active==='pg-records')renderRecords();
+  if(active==='pg-mentorload')renderMentorLoad();
+  if(active==='pg-profiles')renderProfiles();
+  if(active==='pg-confirmed')renderConfirmedPage();
+}
+function toast(msg,warn=false){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast show'+(warn?' warn':'');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+function openModal(html){document.getElementById('modalContent').innerHTML=html;document.getElementById('modalBg').classList.add('open')}
+function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+
+function nav(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  const btn=[...document.querySelectorAll('.sb-btn')].find(b=>b.getAttribute('onclick')?.includes("'"+id+"'"));
+  if(btn)btn.classList.add('active');
+  if(id==='records')renderRecords();
+  if(id==='dashboard')renderDashboard();
+  if(id==='mentorload')renderMentorLoad();
+  if(id==='profiles')renderProfiles();
+  if(id==='confirmed')renderConfirmedPage();
+}
+
+// ══════════════════════════════
+// WORKFLOW
+// ══════════════════════════════
+let currentStep=1;
+function wfGo(n){
+  currentStep=n;
+  document.querySelectorAll('.wf-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('wf'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById('wfs'+i);
+    el.classList.remove('current','done');
+    if(i<n)el.classList.add('done');else if(i===n)el.classList.add('current');
+  }
+  if(n===2)buildWf2Preview();
+}
+
+function buildWf2Preview(){
+  let h='';
+  if(sRows.length){
+    h+=`<div class="card"><div class="card-title" style="margin-bottom:8px">Students loaded — ${sRows.length}</div>`;
+    h+=sRows.slice(0,5).map(r=>`<div style="font-size:12px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border)">
+      <strong style="color:var(--text)">${sc(r,'name')||'—'}</strong>
+      <span style="color:var(--text3);margin:0 6px">·</span>${sc(r,'class_')||'?'}
+      <span style="color:var(--text3);margin:0 6px">·</span><span style="color:var(--blue)">📅 ${sc(r,'days')||'?'}</span>
+      <span style="color:var(--text3);margin:0 6px">·</span><span style="color:var(--orange);font-size:11px">${sc(r,'stage')||'?'}</span>
+    </div>`).join('');
+    if(sRows.length>5)h+=`<div style="font-size:11px;color:var(--text3);padding:5px 0">+${sRows.length-5} more</div>`;
+    h+='</div>';
+  }
+  if(mRows.length){
+    h+=`<div class="card"><div class="card-title" style="margin-bottom:8px">Mentors loaded — ${mRows.length}</div>`;
+    h+=mRows.slice(0,5).map(r=>`<div style="font-size:12px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border)">
+      <strong style="color:var(--text)">${mc(r,'name')||'—'}</strong>
+      <span style="color:var(--text3);margin:0 6px">·</span>${mc(r,'college')||'?'}
+      <span style="color:var(--text3);margin:0 6px">·</span>${msBadgeInline(mc(r,'cleared'))}
+      <span style="color:var(--blue);font-size:11px;margin-left:5px">📅 ${mc(r,'days')||'?'}</span>
+    </div>`).join('');
+    if(mRows.length>5)h+=`<div style="font-size:11px;color:var(--text3);padding:5px 0">+${mRows.length-5} more</div>`;
+    h+='</div>';
+  }
+  document.getElementById('wf2Preview').innerHTML=h;
+}
+
+// ══════════════════════════════
+// DASHBOARD
+// ══════════════════════════════
+async function renderDashboard(){
+  const recs=await getAllRecords();
+  const total=recs.length;
+  const matched=recs.filter(r=>['matched','session_done','feedback_received','completed'].includes(r.status)).length;
+  const sessions=recs.filter(r=>['session_done','feedback_received','completed'].includes(r.status)).length;
+  const fb=recs.filter(r=>['feedback_received','completed'].includes(r.status)).length;
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${total}</div><div class="stat-label">Total students</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${matched}</div><div class="stat-label">Matched</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--green)">${sessions}</div><div class="stat-label">Sessions done</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--yellow)">${fb}</div><div class="stat-label">Feedback received</div></div>`;
+  const recent=[...recs].sort((a,b)=>b.id.localeCompare(a.id)).slice(0,5);
+  document.getElementById('recentAct').innerHTML=recent.length
+    ?recent.map(r=>`<div style="padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:12px;font-weight:500">${r.studentName}</div>
+        <div style="font-size:11px;color:var(--text3)">${r.mentor||'Unmatched'} · ${r.dateMatched||'—'}</div></div>
+        <span class="status-pill s-${r.status}">${stLabel(r.status)}</span></div>`).join('')
+    :'<div style="color:var(--text3);padding:5px 0;font-size:12px">No records yet</div>';
+  const pending=recs.filter(r=>r.status==='matched'&&!r.sessionDate).length;
+  const noFb=recs.filter(r=>r.status==='session_done').length;
+  let pa='';
+  if(pending)pa+=`<div style="margin-bottom:7px;font-size:12px"><span style="font-weight:600;color:var(--yellow)">${pending}</span><span style="color:var(--text3)"> matched — session not yet scheduled</span></div>`;
+  if(noFb)pa+=`<div style="font-size:12px"><span style="font-weight:600;color:var(--orange)">${noFb}</span><span style="color:var(--text3)"> session done — feedback pending</span></div>`;
+  document.getElementById('pendingAct').innerHTML=pa||'<div style="color:var(--text3);font-size:12px;padding:5px 0">All caught up!</div>';
+}
+function stLabel(s){return{pending:'Pending',matched:'Matched',session_done:'Session done',feedback_received:'Feedback in',completed:'Completed'}[s]||s}
+
+// ══════════════════════════════
+// RECORDS
+// ══════════════════════════════
+async function renderRecords(){
+  let recs=await getAllRecords();
+  const sf=document.getElementById('filterStatus')?.value||'';
+  const sq=(document.getElementById('searchRec')?.value||'').toLowerCase();
+  if(sf)recs=recs.filter(r=>r.status===sf);
+  if(sq)recs=recs.filter(r=>(r.studentName||'').toLowerCase().includes(sq)||(r.mentor||'').toLowerCase().includes(sq));
+  const tbody=document.getElementById('recBody');
+  if(!recs.length){tbody.innerHTML=`<tr><td colspan="12" style="text-align:center;color:var(--text3);padding:24px;font-size:12px">No records${sf||sq?' matching filter':' yet'}.</td></tr>`;return}
+  tbody.innerHTML=recs.map((r,i)=>`
+    <tr style="cursor:pointer" onclick="openRecDetail('${r.id}')">
+      <td style="color:var(--text3)">${i+1}</td>
+      <td style="font-weight:500;white-space:nowrap">${r.studentName}</td>
+      <td style="color:var(--text3)">${r.studentClass||'—'}</td>
+      <td style="white-space:nowrap">${r.mentor||'—'}</td>
+      <td>${r.mentorMilestone?msBadgeInline(r.mentorMilestone):'<span style="color:var(--text3)">—</span>'}</td>
+      <td><span style="font-size:11px;font-weight:600;color:${scCol(r.matchScore)}">${r.matchScore?r.matchScore+'/100':'—'}</span></td>
+      <td style="color:var(--text3);text-align:center">${r.sessionCount||1}</td>
+      <td onclick="event.stopPropagation()"><input type="date" value="${r.sessionDate||''}" onchange="updateRec('${r.id}',{sessionDate:this.value})" style="font-size:11px;padding:4px 6px"/></td>
+      <td onclick="event.stopPropagation()">
+        <select onchange="updateRec('${r.id}',{status:this.value})" style="font-size:11px;padding:4px 6px">
+          ${['pending','matched','session_done','feedback_received','completed'].map(s=>`<option value="${s}"${r.status===s?' selected':''}>${stLabel(s)}</option>`).join('')}
+        </select>
+      </td>
+      <td>${r.studentFeedback?.sessionRating?'⭐'.repeat(r.studentFeedback.sessionRating):'<span style="color:var(--text3)">—</span>'}</td>
+      <td>${r.mentorFeedback?.preparednessRating?'⭐'.repeat(r.mentorFeedback.preparednessRating):'<span style="color:var(--text3)">—</span>'}</td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap">
+        <button class="btn btn-secondary btn-sm" onclick="openRecDetail('${r.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="deleteRec('${r.id}')">✕</button>
+      </td>
+    </tr>`).join('');
+}
+function scCol(s){return!s?'var(--text3)':s>=70?'var(--green)':s>=45?'var(--yellow)':'var(--orange)'}
+
+async function openRecDetail(id){
+  const r=await dbGet('records',id);if(!r)return;
+  const sf=r.studentFeedback||{},mf=r.mentorFeedback||{};
+  function row(l,v){return v?`<div class="modal-row"><span class="key">${l}</span><span class="val">${v}</span></div>`:''}
+  function stars(n,max=5){if(!n)return'<span style="color:var(--text3)">—</span>';return Array.from({length:max},(_,i)=>`<span>${i<n?'⭐':'☆'}</span>`).join('')}
+  const html=`
+    <div class="modal-title"><span>${r.studentName} → ${r.mentor||'Unmatched'}</span><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-grid">
+      <div class="modal-section">
+        <div class="modal-section-title">Match details</div>
+        ${row('Student class',r.studentClass)}${row('Mentor college',r.mentorCollege)}
+        ${r.mentorMilestone?`<div class="modal-row"><span class="key">Milestone</span><span class="val">${msBadgeInline(r.mentorMilestone)}</span></div>`:''}
+        ${row('Match score',r.matchScore?r.matchScore+'/100':null)}${row('Overlap days',r.overlapDays)}
+        ${row('Time overlap',r.overlapTime)}${row('Suggested time',r.suggestedTiming)}
+        ${row('Date matched',r.dateMatched)}${row('Session #','Session '+(r.sessionCount||1))}
+        ${row('Session date',r.sessionDate)}${row('Status',stLabel(r.status))}
+        ${r.meetLink?`<div class="modal-row"><span class="key">Meet link</span><a href="${r.meetLink}" target="_blank" style="color:var(--blue)">Open ↗</a></div>`:''}
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Session notes</div>
+        <textarea id="noteField_${id}" style="width:100%;min-height:90px;font-size:12px;resize:vertical;margin-top:4px" placeholder="Add session notes...">${r.notes||''}</textarea>
+        <button class="btn btn-green btn-sm" style="margin-top:8px" onclick="saveNote('${id}')">Save notes</button>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">⭐ Student feedback</div>
+        ${sf.sessionRating?`<div class="modal-row"><span class="key">Session rating</span><span class="val">${stars(sf.sessionRating)}</span></div>`:'<div style="color:var(--text3);font-size:11px">No feedback yet</div>'}
+        ${row('Mentor helpful',sf.mentorHelpful)}${row('Explained clearly',sf.explainedClearly)}
+        ${row('Most useful',sf.mostUseful)}${row('Want another',sf.wantAnotherSession)}
+        ${row('Suggestions',sf.suggestions)}
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">⭐ Mentor feedback</div>
+        ${mf.preparednessRating?`<div class="modal-row"><span class="key">Preparedness</span><span class="val">${stars(mf.preparednessRating)}</span></div>`:'<div style="color:var(--text3);font-size:11px">No feedback yet</div>'}
+        ${row('Came with questions',mf.cameWithQuestions)}
+        ${row('Topics covered',mf.topicsCovered)}${row('Continue',mf.continueWithMentee)}
+        ${row('Notes',mf.notes)}
+      </div>
+    </div>
+    <div style="margin-top:12px"><button class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button></div>`;
+  openModal(html);
+}
+async function saveNote(id){const v=document.getElementById('noteField_'+id)?.value||'';await updateRec(id,{notes:v});toast('Notes saved')}
+
+// ══════════════════════════════
+// COLUMN MAPS
+// ══════════════════════════════
+const SC={
+  ts:'Timestamp',name:'Full name ',phone:'WhatsApp number ',class_:'You are currently in ',
+  email:'Email',city:'Which city / state are you from? ',
+  needs:'What do you want from a mentor?',
+  challenge:'What is your biggest confusion or challenge right now? be specific · e.g. "I don\'t know how to start JEE prep alongside boards" or "I keep failing mock tests despite studying hard" ',
+  stage:'At what stage are you in your preparation right now?',
+  score:'If you are from Class 12 and have already appeared for JEE — what was your score / rank? e.g. JEE Mains: 94 percentile · JEE Advanced: AIR 4200 — leave blank if not applicable ',
+  days:'Which days are you free for a call? * ',time:'Preferred time slot ',
+  duration:'How long do you think you need for your first session?',
+  heard:'How did you hear about us?',
+  extra:'Anything else you want us to know ? e.g. specific college targets, any constraints',
+};
+const MC={
+  ts:'Timestamp',name:'Full name ',phone:'WhatsApp number ',email:'Email',
+  stage:'Your current year / stage ',college:'College and institution you\'re currently in',
+  branch:'College Branch',
+  cleared:'Please specify the exam or milestone you have cleared, along with the year e.g., JEE Advanced 2023',
+  areas:'What areas do you feel most comfortable mentoring in? ',
+  hours:'How many hours per week can you give to mentoring? ',
+  days:'Which days are you generally free? ',time:'Preferred time slot ',
+  capacity:'How many mentees can you handle at once? ',
+  linkedin:'LinkedIn profile link (optional)',
+};
+const SFC={
+  studentName:'Your name',mentorName:'Your mentor\'s name',
+  sessionRating:'How would you rate this session overall?',
+  mentorHelpful:'How helpful was your mentor?',
+  explainedClearly:'Did your mentor explain things clearly?',
+  comfortableAsking:'Did you feel comfortable asking questions?',
+  mostUseful:'What was the most useful thing from this session?',
+  wantAnotherSession:'Would you want another session with this mentor?',
+  dhaaraRating:'How would you rate Dhaaraa overall?',
+  suggestions:'Any suggestions for Dhaaraa or your mentor?',
+};
+const MFC={
+  mentorName:'Your name',studentName:'Your mentee\'s name',
+  preparednessRating:'How prepared was the student for the session?',
+  cameWithQuestions:'Did the student come with specific questions?',
+  engagementRating:'How engaged was the student during the session?',
+  topicsCovered:'What topics were covered in this session?',
+  studentProgress:'Overall impression of the student\'s progress?',
+  continueWithMentee:'Would you be happy to continue with this mentee?',
+  dhaaraRating:'How would you rate Dhaaraa\'s matching and support?',
+  notes:'Any notes or suggestions?',
+};
+
+let sRows=[],mRows=[],sFbRows=[],mFbRows=[],matchResults=[],confirmedMatches=[];
+const sessionLoad={};
+let currentMatchIndex=0;
+
+function gc(row,map,key){
+  const exact=map[key];
+  if(exact!==undefined&&row[exact]!==undefined)return(row[exact]||'').trim();
+  const ALIASES={
+    name:['full name','your name','name'],email:['email','e-mail','mail'],
+    phone:['whatsapp','phone','mobile'],class_:['class','year','currently in','grade','studying'],
+    city:['city','state','location','from'],needs:['want from','need from','looking for'],
+    challenge:['challenge','confusion','struggle','problem','difficulty'],
+    stage:['stage','preparation','prep stage','level','current year'],
+    score:['score','rank','percentile','result','marks'],
+    days:['days','free','available','availability','generally free'],
+    time:['time slot','timing','preferred time'],duration:['duration','long','session length'],
+    extra:['else','know','constraints','additional'],
+    cleared:['cleared','milestone','exam cleared','specify the exam'],
+    areas:['areas','comfortable','mentoring','help with'],
+    hours:['hours','weekly','per week'],capacity:['capacity','mentees','how many'],
+    college:['college','institution','university'],branch:['branch','department','stream'],
+    heard:['hear about','heard about','found us'],linkedin:['linkedin','profile link'],
+  };
+  const aliases=ALIASES[key]||[];
+  const colKeys=Object.keys(row);
+  for(const a of aliases){const found=colKeys.find(k=>k.toLowerCase().includes(a));if(found)return(row[found]||'').trim()}
+  const kw=key.replace(/_/g,' ').toLowerCase().split(' ')[0];
+  const fallback=colKeys.find(k=>k.toLowerCase().includes(kw));
+  return fallback?(row[fallback]||'').trim():'';
+}
+const sc=(r,k)=>gc(r,SC,k);
+const mc=(r,k)=>gc(r,MC,k);
+const sfc=(r,k)=>gc(r,SFC,k);
+const mfc=(r,k)=>gc(r,MFC,k);
+
+// ══════════════════════════════
+// FILE HANDLING
+// ══════════════════════════════
+function dov(e,id){e.preventDefault();document.getElementById(id).classList.add('drag')}
+function dlv(id){document.getElementById(id).classList.remove('drag')}
+function drp(e,t){e.preventDefault();const f=e.dataTransfer.files[0];if(f)pf(f,t)}
+function lf(e,t){const f=e.target.files[0];if(f)pf(f,t)}
+function dedupKey(name,email){const n=(name||'').toLowerCase().trim().replace(/\s+/g,'_');const e=(email||'').toLowerCase().trim();return e?n+'|'+e:n+'|no_email'}
+function parseTS(raw){if(!raw)return 0;const s=String(raw).trim();let d=new Date(s);if(!isNaN(d.getTime()))return d.getTime();const m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);if(m){d=new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));if(!isNaN(d.getTime()))return d.getTime()}return 0}
+
+function pf(file,type){
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const data=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+      if(data.length<2){setSt(type,'File empty',false);return}
+      const hdrs=data[0].map(h=>String(h||'').trim());
+      const rows=data.slice(1).filter(r=>r.some(c=>String(c).trim()));
+      const mapped=rows.map(r=>{const o={};hdrs.forEach((h,i)=>o[h]=String(r[i]||'').trim());return o});
+      if(type==='s'){
+        sRows=mapped;let added=0,updated=0;
+        for(const row of mapped){
+          const name=sc(row,'name'),email=sc(row,'email');if(!name)continue;
+          const key=dedupKey(name,email);const ts=parseTS(row['Timestamp']||'');
+          const existing=await dbGet('students',key);
+          const obj={id:key,name,email,phone:sc(row,'phone'),class_:sc(row,'class_'),city:sc(row,'city'),stage:sc(row,'stage'),challenge:sc(row,'challenge'),needs:sc(row,'needs'),days:sc(row,'days'),time:sc(row,'time'),duration:sc(row,'duration'),score:sc(row,'score'),extra:sc(row,'extra'),heard:sc(row,'heard'),latestTS:ts,entryCount:1};
+          if(existing){if(ts>existing.latestTS){await dbPut('students',{...obj,entryCount:(existing.entryCount||1)+1});updated++}}else{await dbPut('students',obj);added++}
+        }
+        setSt('s',`✓ ${rows.length} rows — ${added} new, ${updated} updated`,true);
+        document.getElementById('sz').classList.add('done');
+        document.getElementById('toStep2Btn').disabled=!(sRows.length&&mRows.length);
+      }
+      else if(type==='m'){
+        mRows=mapped;let added=0,updated=0;
+        for(const row of mapped){
+          const name=mc(row,'name'),email=mc(row,'email');if(!name)continue;
+          const key=dedupKey(name,email);const ts=parseTS(row['Timestamp']||'');
+          const existing=await dbGet('mentors',key);
+          const obj={id:key,name,email,phone:mc(row,'phone'),college:mc(row,'college'),branch:mc(row,'branch'),stage:mc(row,'stage'),cleared:mc(row,'cleared'),areas:mc(row,'areas'),days:mc(row,'days'),hours:mc(row,'hours'),capacity:mc(row,'capacity'),time:mc(row,'time'),linkedin:mc(row,'linkedin'),latestTS:ts};
+          if(existing){if(ts>existing.latestTS){await dbPut('mentors',{...obj});updated++}}else{await dbPut('mentors',obj);added++}
+        }
+        setSt('m',`✓ ${rows.length} rows — ${added} new, ${updated} updated`,true);
+        document.getElementById('mz').classList.add('done');
+        document.getElementById('toStep2Btn').disabled=!(sRows.length&&mRows.length);
+      }
+      else if(type==='fs'){sFbRows=mapped;setSt('fs',`✓ ${rows.length} student feedbacks`,true);document.getElementById('fbs').classList.add('done')}
+      else if(type==='fm'){mFbRows=mapped;setSt('fm',`✓ ${rows.length} mentor feedbacks`,true);document.getElementById('fbm').classList.add('done')}
+    }catch(err){setSt(type,'Read error: '+err.message,false)}
+  };
+  r.readAsBinaryString(file);
+}
+function setSt(t,msg,ok){const ids={s:'ss2',m:'ms2',fs:'fss',fm:'fms'};const el=document.getElementById(ids[t]);if(el){el.textContent=msg;el.className='uz-status '+(ok?'uz-ok':'uz-err')}}
+
+// ══════════════════════════════
+// ALGORITHM
+// ══════════════════════════════
+function parseMilestone(cleared){
+  if(!cleared)return{level:'unknown',year:null,label:'Unknown'};
+  const c=cleared.toLowerCase();const yearMatch=cleared.match(/20(\d\d)/);const year=yearMatch?parseInt('20'+yearMatch[1]):null;
+  if(c.includes('iit'))return{level:'iit',year,label:'IIT (JEE Advanced + IIT admit)'+(year?' · '+year:'')};
+  if(c.includes('advanced'))return{level:'advanced',year,label:'JEE Advanced cleared'+(year?' · '+year:'')};
+  if(c.includes('mains')||c.includes('main'))return{level:'mains',year,label:'JEE Mains cleared'+(year?' · '+year:'')};
+  if(c.includes('bitsat')||c.includes('bits'))return{level:'mains',year,label:'BITSAT cleared'+(year?' · '+year:'')};
+  return{level:'other',year,label:cleared};
+}
+function msBadgeInline(cleared){
+  const ms=parseMilestone(cleared);
+  const map={iit:'ms-iit',advanced:'ms-adv',mains:'ms-mains',other:'ms-other',unknown:'ms-other'};
+  const icon={iit:'🏆',advanced:'⭐',mains:'✓',other:'·',unknown:'?'};
+  return`<span class="badge ${map[ms.level]||'ms-other'}" style="font-size:9px;padding:2px 7px">${icon[ms.level]||'·'} ${ms.label}</span>`;
+}
+
+function milestoneScore(sRow,mRow){
+  const ms=parseMilestone(mc(mRow,'cleared'));
+  const stage=sc(sRow,'stage').toLowerCase()+' '+sc(sRow,'challenge').toLowerCase()+' '+sc(sRow,'needs').toLowerCase();
+  let recencyBonus=0;
+  if(ms.year){const age=new Date().getFullYear()-ms.year;if(age<=2)recencyBonus=.15;else if(age<=4)recencyBonus=.08;else if(age<=6)recencyBonus=.03}
+  let levelScore=0;
+  if(ms.level==='iit'){levelScore=stage.includes('iit')||stage.includes('advanced')?1.0:0.85}
+  else if(ms.level==='advanced'){levelScore=stage.includes('advanced')||stage.includes('iit')?0.9:0.75}
+  else if(ms.level==='mains'){const early=stage.includes('11')||stage.includes('starting')||stage.includes('beginning');levelScore=early?0.8:0.55}
+  else{levelScore=0.4}
+  return{score:Math.min(1,levelScore+recencyBonus),ms,levelScore,recencyBonus};
+}
+
+const JEE_DOMAINS={
+  physics:['physics','mechanics','electrostatics','optics','modern physics','waves','thermodynamics'],
+  chemistry:['chemistry','organic','inorganic','physical chemistry','equilibrium','electrochemistry'],
+  maths:['maths','mathematics','calculus','algebra','coordinate geometry','trigonometry','vectors'],
+  strategy:['strategy','time management','study plan','revision','mock test','test analysis'],
+  motivation:['motivation','stress','anxiety','burnout','confidence','mindset','exam pressure'],
+  college:['college selection','admission','counselling','josaa','cutoff','ranking','nit','iiit'],
+  boards:['boards','class 12','cbse','12th','alongside boards'],
+};
+function domainOverlap(sText,mAreas){
+  const st=sText.toLowerCase(),ma=mAreas.toLowerCase();
+  let hits=0,total=0;
+  for(const[,kws]of Object.entries(JEE_DOMAINS)){const sH=kws.some(k=>st.includes(k));const mH=kws.some(k=>ma.includes(k));if(sH){total++;if(mH)hits++}}
+  return total?hits/total:0;
+}
+
+const STOP=new Set(['i','me','my','the','a','an','is','are','was','were','be','been','have','has','had','do','does','did','will','would','could','should','may','might','to','of','in','for','on','with','at','by','from','as','and','but','or','not','no','so','that','this','there','their','they','them','how','what','when','where','which','who','very','just','also','can','need','want','feel','think','like','good','right','make','take']);
+function tok(t){return t.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>2&&!STOP.has(w))}
+function buildVecs(docs){
+  const tf=docs.map(d=>{const t=tok(d),f={};t.forEach(w=>f[w]=(f[w]||0)+1);const n=t.length||1;Object.keys(f).forEach(k=>f[k]/=n);return f});
+  const df={};tf.forEach(f=>Object.keys(f).forEach(t=>df[t]=(df[t]||0)+1));
+  const N=docs.length;const idf={};Object.keys(df).forEach(t=>idf[t]=Math.log((N+1)/(df[t]+1))+1);
+  return tf.map(f=>{const v={};Object.keys(f).forEach(t=>v[t]=f[t]*(idf[t]||1));return v});
+}
+function cosine(v1,v2){
+  const keys=new Set([...Object.keys(v1),...Object.keys(v2)]);
+  let dot=0,m1=0,m2=0;
+  keys.forEach(k=>{const a=v1[k]||0,b=v2[k]||0;dot+=a*b;m1+=a*a;m2+=b*b});
+  return(!m1||!m2)?0:dot/(Math.sqrt(m1)*Math.sqrt(m2));
+}
+
+const DM={mon:1,tue:2,wed:3,thu:4,fri:5,sat:6,sun:7,monday:1,tuesday:2,wednesday:3,thursday:4,friday:5,saturday:6,sunday:7};
+function parseDays(s){
+  const d=new Set();if(!s)return d;
+  const t=s.toLowerCase().replace(/\band\b/g,' ').replace(/&/g,' ').replace(/weekends?/g,'sat sun').replace(/weekdays?/g,'mon tue wed thu fri').replace(/any\s*day|everyday|daily|all\s*days?/g,'mon tue wed thu fri sat sun').replace(/[,;\/|]+/g,' ');
+  t.split(/\s+/).forEach(w=>{w=w.slice(0,3);if(DM[w])d.add(DM[w])});return d;
+}
+function jaccard(s1,s2){const a=parseDays(s1),b=parseDays(s2);const ov=[...a].filter(d=>b.has(d)).length;const un=new Set([...a,...b]).size;return un?ov/un:0.3}
+const DN={1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat',7:'Sun'};
+function overlapStr(s1,s2){const a=parseDays(s1),b=parseDays(s2);const o=[...a].filter(d=>b.has(d));return o.length?o.map(d=>DN[d]).join(', '):'Check manually'}
+
+const TIME_BUCKETS={morning:['morning','9 am','10 am','11 am','9am','10am','11am','before noon','am'],afternoon:['afternoon','12 pm','1 pm','2 pm','3 pm','noon','post lunch'],evening:['evening','4 pm','5 pm','6 pm','after school','after college'],night:['night','7 pm','8 pm','9 pm','10 pm','late evening','post dinner']};
+function parseTimeSlots(s){const slots=new Set();if(!s)return slots;const l=s.toLowerCase();for(const[b,kws]of Object.entries(TIME_BUCKETS)){if(kws.some(k=>l.includes(k)))slots.add(b)}return slots}
+function timeOverlap(s1,s2){const a=parseTimeSlots(s1),b=parseTimeSlots(s2);const ov=[...a].filter(t=>b.has(t)).length;if(!a.size&&!b.size)return 0.5;const un=new Set([...a,...b]).size;return un?ov/un:0}
+function timeOverlapStr(s1,s2){const a=parseTimeSlots(s1),b=parseTimeSlots(s2);const ov=[...a].filter(t=>b.has(t));if(!ov.length)return'Check timing';return ov.map(t=>t.charAt(0).toUpperCase()+t.slice(1)).join(', ')}
+
+function buildTimingSuggestions(sRow,mRow){
+  const overlappingDays=overlapStr(sc(sRow,'days'),mc(mRow,'days'));
+  const overlappingTime=timeOverlapStr(sc(sRow,'time'),mc(mRow,'time'));
+  const suggestions=[];
+  const days=overlappingDays==='Check manually'?[]:overlappingDays.split(', ');
+  const times=overlappingTime==='Check timing'?['Evening']:overlappingTime.split(', ');
+  days.slice(0,3).forEach(d=>{
+    times.slice(0,2).forEach(t=>{
+      const timeMap={Morning:'10:00 AM',Afternoon:'2:00 PM',Evening:'5:00 PM',Night:'8:00 PM'};
+      suggestions.push(`${d} at ${timeMap[t]||t}`);
+    });
+  });
+  return suggestions.slice(0,4);
+}
+
+function parseCapacity(raw){if(!raw)return 2;const s=String(raw).toLowerCase();const words={one:1,two:2,three:3,four:4,five:5,six:6};for(const[w,n]of Object.entries(words)){if(s.includes(w))return n}const nums=s.match(/\d+/g);if(nums)return Math.max(...nums.map(Number));return 2}
+function mentorAvgRating(recs,mName){const rs=recs.filter(r=>r.mentor?.toLowerCase()===mName.toLowerCase()&&r.studentFeedback?.sessionRating);if(!rs.length)return null;return rs.reduce((s,r)=>s+(r.studentFeedback.sessionRating||0),0)/rs.length}
+function nameIncludes(a,b){if(!a||!b)return false;const al=a.toLowerCase().trim(),bl=b.toLowerCase().trim();if(al===bl)return true;const af=al.split(' ')[0],bf=bl.split(' ')[0];if(af.length>=4&&bl.includes(af))return true;if(bf.length>=4&&al.includes(bf))return true;return false}
+function wantsRepeat(recs,sName,mName){return recs.some(r=>nameIncludes(r.studentName,sName)&&nameIncludes(r.mentor,mName)&&r.studentFeedback?.wantAnotherSession?.toLowerCase().includes('yes'))}
+function mentorWillContinue(recs,sName,mName){const rec=recs.find(r=>nameIncludes(r.studentName,sName)&&nameIncludes(r.mentor,mName)&&r.mentorFeedback?.continueWithMentee);return rec?rec.mentorFeedback.continueWithMentee.toLowerCase():null}
+
+const W={skill:0.30,milestone:0.25,days:0.17,time:0.08,domain:0.10,fb:0.05,cap:0.05};
+
+async function runMatch(){
+  document.getElementById('ml').classList.add('show');
+  document.getElementById('matchWrap').innerHTML='';
+  await new Promise(r=>setTimeout(r,80));
+  try{
+    if(!sRows.length||!mRows.length)throw new Error('Upload both student and mentor files first');
+    const sDocs=sRows.map(r=>`${sc(r,'challenge')} ${sc(r,'needs')} ${sc(r,'stage')} ${sc(r,'extra')}`);
+    const mDocs=mRows.map(r=>`${mc(r,'areas')} ${mc(r,'branch')} ${mc(r,'cleared')} ${mc(r,'stage')}`);
+    const allVecs=buildVecs([...sDocs,...mDocs]);
+    const sVecs=allVecs.slice(0,sRows.length);
+    const mVecs=allVecs.slice(sRows.length);
+    const existing=await getAllRecords();
+    const existLoad={};
+    existing.forEach(r=>{if(r.mentor&&r.status!=='pending')existLoad[r.mentor]=(existLoad[r.mentor]||0)+1});
+
+    matchResults=sRows.map((sRow,si)=>{
+      const sName=sc(sRow,'name');
+      const repeatMentors=mRows.filter(mRow=>{const mName=mc(mRow,'name');return wantsRepeat(existing,sName,mName)&&mentorWillContinue(existing,sName,mName)!=='no'});
+      const opts=mRows.map((mRow,mi)=>{
+        const mName=mc(mRow,'name');
+        const skillRaw=cosine(sVecs[si],mVecs[mi]);
+        const{score:msScore,ms,recencyBonus}=milestoneScore(sRow,mRow);
+        const daysRaw=jaccard(sc(sRow,'days'),mc(mRow,'days'));
+        const timeRaw=timeOverlap(sc(sRow,'time'),mc(mRow,'time'));
+        const domRaw=domainOverlap(sc(sRow,'challenge')+' '+sc(sRow,'needs'),mc(mRow,'areas'));
+        const avgRating=mentorAvgRating(existing,mName);
+        const fbScore=avgRating===null?0.5:Math.min(avgRating/5,1);
+        const capMax=parseCapacity(mc(mRow,'capacity'));
+        const capUsed=(existLoad[mName]||0)+(sessionLoad[mName]||0);
+        const capRem=Math.max(0,capMax-capUsed);
+        const capScore=capRem/capMax;
+        const isRepeat=repeatMentors.some(m=>mc(m,'name').toLowerCase()===mName.toLowerCase());
+        const repeatBonus=isRepeat?0.20:0;
+        const raw=(skillRaw*W.skill+msScore*W.milestone+daysRaw*W.days+timeRaw*W.time+domRaw*W.domain+fbScore*W.fb+capScore*W.cap)+repeatBonus;
+        const total=Math.min(100,Math.round(raw*100));
+        const reasons=[];const warnings=[];
+        if(isRepeat)reasons.push({text:'Student requested repeat — mentor willing to continue',type:'repeat'});
+        if(ms.level==='iit')reasons.push({text:`IIT mentor ${ms.year?'('+ms.year+')':''} — cleared Advanced + IIT admit`,type:'good'});
+        else if(ms.level==='advanced')reasons.push({text:`JEE Advanced cleared ${ms.year?'('+ms.year+')':''}${recencyBonus>0.1?' — recent':''}`,type:'good'});
+        else if(ms.level==='mains')reasons.push({text:`JEE Mains cleared ${ms.year?'('+ms.year+')':''}`,type:'ok'});
+        else warnings.push('Milestone unclear — verify');
+        if(skillRaw>=0.65)reasons.push({text:'Strong topic overlap',type:'good'});
+        else if(skillRaw>=0.35)reasons.push({text:'Moderate skill overlap',type:'ok'});
+        else warnings.push('Low skill overlap — review');
+        if(domRaw>=0.6)reasons.push({text:'High JEE domain match',type:'good'});
+        else if(domRaw>=0.3)reasons.push({text:'Partial domain match',type:'ok'});
+        else warnings.push('Domain mismatch — verify');
+        const dayOv=overlapStr(sc(sRow,'days'),mc(mRow,'days'));
+        if(daysRaw>=0.75)reasons.push({text:`Excellent day overlap — ${dayOv}`,type:'good'});
+        else if(daysRaw>=0.4)reasons.push({text:`Partial day overlap — ${dayOv}`,type:'ok'});
+        else warnings.push(`Low day overlap (${dayOv})`);
+        const tOv=timeOverlapStr(sc(sRow,'time'),mc(mRow,'time'));
+        if(timeRaw>=0.5)reasons.push({text:`Time match — ${tOv}`,type:'good'});
+        else if(timeRaw>0)reasons.push({text:`Partial time overlap — ${tOv}`,type:'ok'});
+        else warnings.push('No time overlap — confirm before booking');
+        if(avgRating!==null)reasons.push({text:`Past rating: ${avgRating.toFixed(1)}/5 ⭐`,type:avgRating>=4?'good':avgRating>=3?'ok':'warn'});
+        if(capRem===0)warnings.push('At capacity — no slots');
+        else if(capRem===1)warnings.push('Only 1 slot remaining');
+        const timingSuggestions=buildTimingSuggestions(sRow,mRow);
+        return{mi,mRow,mName,total,skill:Math.round(skillRaw*100),milestone:Math.round(msScore*100),days:Math.round(daysRaw*100),time:Math.round(timeRaw*100),domain:Math.round(domRaw*100),dayOv,timeOv:tOv,timingSuggestions,capRem,capMax,isRepeat,avgRating,ms,reasons,warnings};
+      })
+      .filter(o=>o.capRem>0)
+      .sort((a,b)=>{if(a.isRepeat&&!b.isRepeat)return-1;if(!a.isRepeat&&b.isRepeat)return 1;return b.total-a.total})
+      .slice(0,3);
+      return{sRow,si,opts,_picked:0,hasRepeat:repeatMentors.length>0,_meetLink:'',_confirmed:false};
+    });
+    document.getElementById('ml').classList.remove('show');
+    currentMatchIndex=0;
+    renderSingleMatch();
+  }catch(err){
+    document.getElementById('ml').classList.remove('show');
+    document.getElementById('matchWrap').innerHTML=`<div class="alert alert-orange"><span class="alert-icon">⚠</span><div>${err.message}</div></div>`;
+  }
+}
+
+// ══════════════════════════════
+// ONE-AT-A-TIME MATCH UI
+// ══════════════════════════════
+const CLR=['#C85A1A','#1A5FA0','#1A7A45','#5A3A9A','#8A6200','#A01A1A'];
+const ini=n=>(n||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+function renderSingleMatch(){
+  if(!matchResults.length){document.getElementById('matchWrap').innerHTML='<div class="alert alert-orange"><span class="alert-icon">⚠</span><div>No match results.</div></div>';return}
+  const si=currentMatchIndex;
+  const res=matchResults[si];
+  const sRow=res.sRow;
+  const sName=sc(sRow,'name');
+  const confirmed=matchResults.filter(r=>r._confirmed).length;
+
+  let h=`
+    <div class="match-nav">
+      <div>
+        <div class="match-nav-count">Student ${si+1} of ${matchResults.length}</div>
+        <div class="match-nav-info">${confirmed} confirmed so far · ${matchResults.length-si-1} remaining</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        ${si>0?`<button class="btn btn-secondary btn-sm" onclick="goToMatch(${si-1})">← Previous</button>`:''}
+        ${si<matchResults.length-1?`<button class="btn btn-secondary btn-sm" onclick="goToMatch(${si+1})">Next →</button>`:''}
+        ${confirmed>0?`<button class="btn btn-green btn-sm" onclick="finalizeAll()">✓ Done — save all (${confirmed})</button>`:''}
+      </div>
+    </div>
+
+    <div style="background:var(--border);border-radius:100px;height:4px;margin-bottom:16px;overflow:hidden">
+      <div style="height:100%;width:${((si+1)/matchResults.length*100).toFixed(0)}%;background:var(--orange);border-radius:100px;transition:width .3s"></div>
+    </div>
+
+    <div class="student-header">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div class="student-avatar" style="background:${CLR[si%CLR.length]}">${ini(sName)}</div>
+        <div class="student-meta">
+          <div class="student-name">${sName||'Student '+(si+1)}</div>
+          <div class="student-info-row" style="margin-top:5px">
+            <span class="info-chip">🎓 ${sc(sRow,'class_')||'?'}</span>
+            <span class="info-chip">📅 ${sc(sRow,'days')||'?'}</span>
+            <span class="info-chip">🕐 ${sc(sRow,'time')||'?'}</span>
+            <span class="info-chip" style="color:var(--orange);border-color:var(--orange-border);background:var(--orange-bg)">${sc(sRow,'stage')||'?'}</span>
+          </div>
+        </div>
+        ${res._confirmed?`<span style="font-size:11px;font-weight:500;color:var(--green);background:var(--green-bg);border:1px solid var(--green-border);padding:4px 10px;border-radius:100px;white-space:nowrap">✓ Confirmed</span>`:''}
+      </div>
+      <div style="margin-top:10px">
+        <div class="challenge-label">Challenge</div>
+        <div class="challenge-box">${sc(sRow,'challenge')||'Not specified'}
+          ${sc(sRow,'needs')?`<div style="margin-top:5px;padding-top:5px;border-top:1px solid var(--border);font-size:11px;color:var(--text3)"><strong style="color:var(--text2)">Needs:</strong> ${sc(sRow,'needs')}</div>`:''}
+          ${sc(sRow,'score')?`<div style="margin-top:4px;font-size:11px;color:var(--text3)"><strong style="color:var(--text2)">JEE score:</strong> ${sc(sRow,'score')}</div>`:''}
+        </div>
+      </div>
+    </div>
+
+    ${res._confirmed?`<div class="change-match-bar"><span class="change-match-txt">⚠ Already confirmed — you can still change the mentor below before saving</span><button class="btn btn-warn btn-sm" onclick="matchResults[${si}]._confirmed=false;renderSingleMatch()">↺ Undo confirm</button></div>`:''}
+    ${res.hasRepeat?`<div class="alert alert-purple"><span class="alert-icon">🔄</span><div>Student requested a repeat session — shown first below</div></div>`:''}
+
+    <div class="mentor-options-label">Select the best mentor for ${sName.split(' ')[0]||'this student'}</div>`;
+
+  res.opts.forEach((o,oi)=>{
+    const isRepeat=o.isRepeat;
+    const rankLabel=isRepeat?'🔄 Repeat request':['#1 Best match','#2 Good match','#3 Alternative'][oi];
+    const rankClass=isRepeat?'rank-repeat':['rank-1','rank-2','rank-3'][oi];
+    const totalCol=o.total>=70?'var(--green)':o.total>=45?'var(--yellow)':'var(--orange)';
+    const isSelected=res._picked===oi;
+    const timing=o.timingSuggestions;
+
+    h+=`<div class="mentor-option${isSelected?' selected':''}${isRepeat?' repeat-opt':''}" id="opt_${si}_${oi}" onclick="selOpt(${si},${oi})">
+      <div class="opt-header">
+        <div class="opt-left">
+          <div style="margin-bottom:6px"><span class="badge ${rankClass}" style="font-size:9px">${rankLabel}</span></div>
+          <div class="opt-mentor-name">${mc(o.mRow,'name')}</div>
+          <div class="opt-mentor-sub">${mc(o.mRow,'college')}</div>
+          ${msBadgeInline(mc(o.mRow,'cleared'))}
+        </div>
+        <div style="text-align:right">
+          <div class="opt-score" style="color:${totalCol}">${o.total}</div>
+          <div style="font-size:10px;color:var(--text3)">out of 100</div>
+        </div>
+      </div>
+
+      <div class="admin-details">
+        <div class="admin-label">🔒 Admin only — not sent to students or mentors</div>
+        <div class="admin-grid">
+          <div class="admin-row"><div class="admin-key">Branch</div><div class="admin-val">${mc(o.mRow,'branch')||'—'}</div></div>
+          <div class="admin-row"><div class="admin-key">Milestone (raw)</div><div class="admin-val">${mc(o.mRow,'cleared')||'—'}</div></div>
+          <div class="admin-row"><div class="admin-key">Student's pref time</div><div class="admin-val">${sc(sRow,'time')||'—'}</div></div>
+          <div class="admin-row"><div class="admin-key">Mentor's pref time</div><div class="admin-val">${mc(o.mRow,'time')||'—'}</div></div>
+          <div class="admin-row"><div class="admin-key">Student's days</div><div class="admin-val">${sc(sRow,'days')||'—'}</div></div>
+          <div class="admin-row"><div class="admin-key">Mentor's days</div><div class="admin-val">${mc(o.mRow,'days')||'—'}</div></div>
+          <div class="admin-row"><div class="admin-key">Capacity remaining</div><div class="admin-val">${o.capRem}/${o.capMax} slots</div></div>
+          <div class="admin-row"><div class="admin-key">Hours/week</div><div class="admin-val">${mc(o.mRow,'hours')||'—'}</div></div>
+          ${o.avgRating!==null?`<div class="admin-row"><div class="admin-key">Past avg rating</div><div class="admin-val">⭐ ${o.avgRating.toFixed(1)}/5</div></div>`:''}
+        </div>
+      </div>
+
+      ${timing.length?`<div class="timing-suggestion">
+        <div class="timing-label">📅 Suggested meeting times (based on overlap)</div>
+        <div class="timing-chips">${timing.map(t=>`<span class="timing-chip">${t}</span>`).join('')}</div>
+      </div>`:''}
+
+      <div class="score-bars">
+        ${sbar('Skill',o.skill,'var(--green)')}
+        ${sbar('Milestone',o.milestone,'var(--yellow)')}
+        ${sbar('Days',o.days,'var(--blue)')}
+        ${sbar('Time',o.time,'var(--purple)')}
+        ${sbar('Domain',o.domain,'var(--orange)')}
+      </div>
+      <div class="score-total-row">
+        <span class="score-total-key">Total</span>
+        <div class="score-total-bar"><div style="height:100%;width:${o.total}%;background:${totalCol};border-radius:3px"></div></div>
+        <span style="font-size:12px;font-weight:600;color:${totalCol};min-width:42px;text-align:right">${o.total}/100</span>
+      </div>
+
+      <div class="reasons">
+        ${o.reasons.map(r=>`<div class="reason-item reason-${r.type==='repeat'?'good':r.type}"><span>▸</span><span>${r.text}</span></div>`).join('')}
+        ${o.warnings.map(w=>`<div class="warn-item"><span>⚠</span><span>${w}</span></div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  h+=`<div class="override-section">
+    <div class="override-label">Change match — assign any mentor (overrides algorithm selection above)</div>
+    <div class="override-row">
+      <select id="overrideSel_${si}" style="flex:1;min-width:180px">
+        <option value="">— select mentor —</option>
+        ${mRows.map(mRow=>`<option value="${mc(mRow,'name')}">${mc(mRow,'name')} — ${mc(mRow,'college')} (${parseMilestone(mc(mRow,'cleared')).label})</option>`).join('')}
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="applyOverride(${si})">Apply</button>
+    </div>
+    <div id="overrideApplied_${si}"></div>
+  </div>`;
+
+  h+=`<div class="meet-section">
+    <div class="meet-section-title">Google Meet link for this session</div>
+    <div class="meet-input-row">
+      <input class="meet-input" id="meetInp_${si}" type="url" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="${res._meetLink||''}" oninput="matchResults[${si}]._meetLink=this.value"/>
+      <a href="https://meet.google.com/new" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;white-space:nowrap">Create Meet ↗</a>
+    </div>
+    <div class="timing-note" id="timingNote_${si}">${getTimingNote(si)}</div>
+  </div>`;
+
+  h+=`<div class="email-preview">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:7px">
+      <div class="meet-section-title" style="margin-bottom:0">Email preview</div>
+      <button class="btn btn-secondary btn-sm" onclick="refreshEmailPreview(${si})">↻ Refresh preview</button>
+    </div>
+    <div class="email-tabs">
+      <button class="email-tab active" onclick="swet(${si},'s',this)">Student email</button>
+      <button class="email-tab" onclick="swet(${si},'m',this)">Mentor email</button>
+    </div>
+    <div id="emailBody_${si}_s" class="email-body">Select a mentor and click Refresh preview</div>
+    <div id="emailBody_${si}_m" class="email-body" style="display:none">Select a mentor and click Refresh preview</div>
+    <div class="email-actions">
+      <button class="btn btn-secondary btn-sm" onclick="cpEmail(this,${si},'s')">Copy student email</button>
+      <button class="btn btn-secondary btn-sm" onclick="cpEmail(this,${si},'m')">Copy mentor email</button>
+    </div>
+  </div>`;
+
+  h+=`<div class="btn-row">
+    <button class="btn btn-green" onclick="confirmThisMatch(${si})">
+      ${res._confirmed?'↺ Re-confirm with new selection':'✓ Confirm this match'}
+    </button>
+    ${si<matchResults.length-1?`<button class="btn btn-secondary" onclick="goToMatch(${si+1})">Skip → Next student</button>`:''}
+    ${confirmed>0?`<button class="btn btn-primary" onclick="finalizeAll()">Save all ${confirmed} confirmed matches →</button>`:''}
+  </div>`;
+
+  document.getElementById('matchWrap').innerHTML=h;
+}
+
+function sbar(key,val,col){
+  return`<div class="score-row"><span class="score-key">${key}</span><div class="score-bar-bg"><div class="score-bar-fill" style="width:${val}%;background:${col}"></div></div><span class="score-val" style="color:${col}">${val}%</span></div>`;
+}
+
+function getTimingNote(si){
+  const res=matchResults[si];if(!res)return'';
+  const o=res.opts[res._picked||0];if(!o)return'Based on overlap — select a mentor to see timing suggestions';
+  const tips=o.timingSuggestions;
+  if(!tips||!tips.length)return'No clear overlap found — coordinate timing directly via email';
+  return`Suggested times: <strong>${tips.join(' · ')}</strong>. Send this in your email to both parties.`;
+}
+
+function selOpt(si,oi){
+  for(let i=0;i<4;i++){const el=document.getElementById(`opt_${si}_${i}`);if(el)el.classList.remove('selected')}
+  document.getElementById(`opt_${si}_${oi}`)?.classList.add('selected');
+  matchResults[si]._picked=oi;
+  const tNote=document.getElementById(`timingNote_${si}`);
+  if(tNote)tNote.innerHTML=getTimingNote(si);
+}
+
+function applyOverride(si){
+  const sel=document.getElementById('overrideSel_'+si);
+  if(!sel||!sel.value)return;
+  const mName=sel.value;
+  const mRow=mRows.find(r=>mc(r,'name')===mName);
+  if(!mRow){toast('Mentor not found',true);return}
+  const sRow=matchResults[si].sRow;
+  const ms=parseMilestone(mc(mRow,'cleared'));
+  const synOpt={mi:mRows.indexOf(mRow),mRow,mName,total:0,skill:0,milestone:0,days:0,time:0,domain:0,
+    dayOv:overlapStr(sc(sRow,'days'),mc(mRow,'days')),timeOv:timeOverlapStr(sc(sRow,'time'),mc(mRow,'time')),
+    timingSuggestions:buildTimingSuggestions(sRow,mRow),
+    capRem:99,capMax:99,isRepeat:false,avgRating:null,ms,
+    reasons:[],warnings:['Manually assigned — not algorithm scored'],isManualOverride:true};
+  matchResults[si].opts[3]=synOpt;matchResults[si]._picked=3;
+  document.getElementById('overrideApplied_'+si).innerHTML=`<div style="margin-top:7px;font-size:12px;color:var(--green)">✓ Override applied: <strong>${mName}</strong></div>`;
+  renderSingleMatch();
+  toast('Override applied: '+mName);
+}
+
+function goToMatch(idx){
+  if(idx<0||idx>=matchResults.length)return;
+  currentMatchIndex=idx;
+  renderSingleMatch();
+}
+
+function getPicked(si){
+  const res=matchResults[si];const oi=res._picked||0;const opt=res.opts[oi];
+  if(!opt)return{opt:null,mRow:null};
+  const mRow=opt.isManualOverride?opt.mRow:mRows[opt.mi];
+  return{opt,mRow};
+}
+
+async function refreshEmailPreview(si){
+  const{opt,mRow}=getPicked(si);
+  if(!opt||!mRow){toast('Select a mentor first',true);return}
+  const lnk=matchResults[si]._meetLink||document.getElementById(`meetInp_${si}`)?.value||'[paste meet link]';
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+  const sEmail=sc(matchResults[si].sRow,'email')||'their email address';
+  const sBody=document.getElementById(`emailBody_${si}_s`);
+  const mBody=document.getElementById(`emailBody_${si}_m`);
+  if(sBody)sBody.textContent=buildSEmail(matchResults[si].sRow,mRow,opt,lnk,fbs,sEmail);
+  if(mBody)mBody.textContent=buildMEmail(matchResults[si].sRow,mRow,opt,lnk,fbm);
+  toast('Email preview updated');
+}
+
+function swet(si,t,btn){
+  document.querySelectorAll(`#emailBody_${si}_s,#emailBody_${si}_m`).forEach(el=>el.style.display='none');
+  document.querySelectorAll(`.email-preview .email-tab`).forEach(b=>b.classList.remove('active'));
+  document.getElementById(`emailBody_${si}_${t}`).style.display='block';
+  btn.classList.add('active');
+}
+
+async function cpEmail(btn,si,t){
+  const{opt,mRow}=getPicked(si);if(!opt||!mRow){toast('Select a mentor first',true);return}
+  const lnk=matchResults[si]._meetLink||'';
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+  const sEmail=sc(matchResults[si].sRow,'email')||'their email';
+  const txt=t==='s'?buildSEmail(matchResults[si].sRow,mRow,opt,lnk,fbs,sEmail):buildMEmail(matchResults[si].sRow,mRow,opt,lnk,fbm);
+  navigator.clipboard.writeText(txt).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent=t==='s'?'Copy student email':'Copy mentor email',2000)});
+}
+
+async function confirmThisMatch(si){
+  const{opt,mRow}=getPicked(si);
+  if(!opt||!mRow){toast('Select a mentor first',true);return}
+  const lnk=document.getElementById(`meetInp_${si}`)?.value||'';
+  matchResults[si]._meetLink=lnk;
+  matchResults[si]._confirmed=true;
+  matchResults[si]._mRow=mRow;
+  matchResults[si]._opt=opt;
+  toast(`✓ ${sc(matchResults[si].sRow,'name')} → ${mc(mRow,'name')} confirmed`);
+  if(si<matchResults.length-1){setTimeout(()=>goToMatch(si+1),800)}
+  else{renderSingleMatch()}
+}
+
+async function finalizeAll(){
+  const toSave=matchResults.filter(r=>r._confirmed&&r._opt&&r._mRow);
+  if(!toSave.length){toast('No confirmed matches yet',true);return}
+  const today=new Date().toISOString().split('T')[0];
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+  confirmedMatches=[];
+  for(const p of toSave){
+    const mName=mc(p._mRow,'name'),sName=sc(p.sRow,'name');
+    sessionLoad[mName]=(sessionLoad[mName]||0)+1;
+    const existing=await getAllRecords();
+    const prev=existing.find(r=>r.studentName?.toLowerCase()===sName.toLowerCase()&&r.mentor?.toLowerCase()===mName.toLowerCase());
+    const sessionCount=(prev?.sessionCount||0)+1;
+    const id='rec_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+    const rec={id,studentName:sName,studentClass:sc(p.sRow,'class_'),studentEmail:sc(p.sRow,'email'),
+      mentor:mName,mentorCollege:mc(p._mRow,'college'),mentorEmail:mc(p._mRow,'email'),
+      mentorMilestone:mc(p._mRow,'cleared'),
+      matchScore:p._opt.total,overlapDays:p._opt.dayOv,overlapTime:p._opt.timeOv,
+      suggestedTiming:p._opt.timingSuggestions?.join(', ')||'',
+      meetLink:p._meetLink||'',dateMatched:today,sessionDate:'',sessionCount,
+      batchName:document.getElementById('batchName')?.value||'',
+      status:'matched',notes:'',studentFeedback:{},mentorFeedback:{}};
+    await dbPut('records',rec);
+    confirmedMatches.push({res:p,opt:p._opt,mRow:p._mRow,lnk:p._meetLink||'',recId:id});
+  }
+  refreshAll();
+  toast(`${toSave.length} matches saved!`);
+  renderConfirmedPage();
+  nav('confirmed');
+}
+
+// ══════════════════════════════════════════════════════
+// CONFIRMED PAGE — loads ALL records from DB, not just current session
+// ══════════════════════════════════════════════════════
+async function renderConfirmedPage(){
+  const el=document.getElementById('confirmedList');if(!el)return;
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+
+  // Load all matched records from DB
+  const allRecs=await getAllRecords();
+  const matchedRecs=allRecs.filter(r=>r.mentor&&['matched','session_done','feedback_received','completed'].includes(r.status));
+
+  if(!matchedRecs.length){
+    el.innerHTML=`<div class="alert alert-blue"><span class="alert-icon">ℹ</span><div>No confirmed matches yet. Go to <strong>Match Students</strong> to create and save matches.</div></div>`;
+    return;
+  }
+
+  // Sort: most recent first
+  matchedRecs.sort((a,b)=>(b.dateMatched||'').localeCompare(a.dateMatched||'')||(b.id||'').localeCompare(a.id||''));
+
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div style="font-size:13px;color:var(--text2)"><strong style="color:var(--text)">${matchedRecs.length}</strong> confirmed match${matchedRecs.length!==1?'es':''} in total</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm" onclick="cpAllEmailsFromDB()">Copy all emails</button>
+      <button class="btn btn-secondary btn-sm" onclick="renderConfirmedPage()">↻ Refresh</button>
+    </div>
+  </div>`;
+
+  matchedRecs.forEach((rec,i)=>{
+    const ms=parseMilestone(rec.mentorMilestone||'');
+    const lnk=rec.meetLink||'';
+    const sEmail=rec.studentEmail||'';
+    const mEmail=rec.mentorEmail||'';
+    const sBody=buildSEmailFromRec(rec,lnk,fbs);
+    const mBody=buildMEmailFromRec(rec,lnk,fbm);
+    const statusClass='s-'+(rec.status||'matched');
+
+    h+=`<div class="confirmed-item from-db" id="ci_${i}">
+      <div class="confirmed-header">
+        <div>
+          <div class="confirmed-names">${rec.studentName} → ${rec.mentor}</div>
+          <div class="confirmed-meta">
+            ${rec.mentorCollege||'—'} · ${ms.label}
+            ${rec.matchScore?' · Score: '+rec.matchScore+'/100':''}
+            ${rec.overlapDays?' · 📅 '+rec.overlapDays:''}
+            ${rec.overlapTime?' · 🕐 '+rec.overlapTime:''}
+            ${rec.dateMatched?' · Matched: '+rec.dateMatched:''}
+            ${rec.sessionCount?' · Session #'+rec.sessionCount:''}
+            ${rec.batchName?' · '+rec.batchName:''}
+          </div>
+        </div>
+        <span class="status-pill ${statusClass}">${stLabel(rec.status)}</span>
+      </div>
+
+      <!-- Meet link — editable, updates emails live -->
+      <div class="conf-meet-row">
+        <label>Meet link</label>
+        <input class="conf-meet-inp" id="dbMeet_${i}" type="url" placeholder="https://meet.google.com/xxx-xxxx-xxx"
+          value="${lnk}" oninput="updateDBMeet(${i},'${rec.id}',this.value)"/>
+        <a href="https://meet.google.com/new" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;white-space:nowrap;flex-shrink:0">Create ↗</a>
+        <button class="btn btn-green btn-sm" onclick="refreshDBEmails(${i},'${rec.id}')" style="flex-shrink:0">↻ Update</button>
+      </div>
+
+      <div class="confirmed-emails">
+        <div class="email-panel">
+          <div class="email-panel-label" style="color:var(--blue)">Student email · <span style="font-weight:400;color:var(--text3)">${sEmail||'no email on file'}</span></div>
+          <div class="email-panel-body" id="dbSBody_${i}">${sBody}</div>
+          <div class="email-panel-actions">
+            <button class="btn btn-secondary btn-sm" onclick="cpDBEmail(this,${i},'${rec.id}','s')">Copy</button>
+            ${sEmail?`<a href="mailto:${sEmail}?subject=${encodeURIComponent('Your Dhaaraa mentor is confirmed!')}&body=${encodeURIComponent(sBody)}" class="btn btn-blue btn-sm" style="text-decoration:none" id="dbSMail_${i}">Gmail ↗</a>`:''}
+          </div>
+        </div>
+        <div class="email-panel">
+          <div class="email-panel-label" style="color:var(--orange)">Mentor email · <span style="font-weight:400;color:var(--text3)">${mEmail||'no email on file'}</span></div>
+          <div class="email-panel-body" id="dbMBody_${i}">${mBody}</div>
+          <div class="email-panel-actions">
+            <button class="btn btn-secondary btn-sm" onclick="cpDBEmail(this,${i},'${rec.id}','m')">Copy</button>
+            ${mEmail?`<a href="mailto:${mEmail}?subject=${encodeURIComponent('Your Dhaaraa mentee details')}&body=${encodeURIComponent(mBody)}" class="btn btn-primary btn-sm" style="text-decoration:none" id="dbMMail_${i}">Gmail ↗</a>`:''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML=h;
+
+  // Store rec ids in a way JS can look them up when updating
+  window._dbConfirmedRecs = matchedRecs;
+}
+
+// Save updated meet link to DB and refresh email panels
+async function updateDBMeet(i,recId,val){
+  // Save to DB immediately
+  const rec=await dbGet('records',recId);
+  if(rec){await dbPut('records',{...rec,meetLink:val})}
+}
+
+async function refreshDBEmails(i,recId){
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+  const lnk=document.getElementById(`dbMeet_${i}`)?.value||'';
+  // Save link to DB
+  const rec=await dbGet('records',recId);
+  if(rec){
+    await dbPut('records',{...rec,meetLink:lnk});
+    const sBody=buildSEmailFromRec({...rec,meetLink:lnk},lnk,fbs);
+    const mBody=buildMEmailFromRec({...rec,meetLink:lnk},lnk,fbm);
+    const sEl=document.getElementById(`dbSBody_${i}`);
+    const mEl=document.getElementById(`dbMBody_${i}`);
+    if(sEl)sEl.textContent=sBody;
+    if(mEl)mEl.textContent=mBody;
+    // Update mailto links
+    const sEmail=rec.studentEmail||'',mEmail=rec.mentorEmail||'';
+    const sMail=document.getElementById(`dbSMail_${i}`);
+    const mMail=document.getElementById(`dbMMail_${i}`);
+    if(sMail&&sEmail)sMail.href=`mailto:${sEmail}?subject=${encodeURIComponent('Your Dhaaraa mentor is confirmed!')}&body=${encodeURIComponent(sBody)}`;
+    if(mMail&&mEmail)mMail.href=`mailto:${mEmail}?subject=${encodeURIComponent('Your Dhaaraa mentee details')}&body=${encodeURIComponent(mBody)}`;
+    toast(`✓ Meet link saved & emails updated for pair ${i+1}`);
+  }
+}
+
+async function cpDBEmail(btn,i,recId,type){
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+  const lnk=document.getElementById(`dbMeet_${i}`)?.value||'';
+  const rec=await dbGet('records',recId);
+  if(!rec){toast('Record not found',true);return}
+  const txt=type==='s'?buildSEmailFromRec({...rec,meetLink:lnk},lnk,fbs):buildMEmailFromRec({...rec,meetLink:lnk},lnk,fbm);
+  navigator.clipboard.writeText(txt).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)});
+}
+
+async function cpAllEmailsFromDB(){
+  const fbs=await getSetting('fbStudent'),fbm=await getSetting('fbMentor');
+  const recs=window._dbConfirmedRecs||[];
+  let txt='DHAARAA CONFIRMED MATCHES\n'+'═'.repeat(50)+'\n\n';
+  recs.forEach((rec,i)=>{
+    const lnk=document.getElementById(`dbMeet_${i}`)?.value||rec.meetLink||'no link yet';
+    txt+=`MATCH ${i+1}: ${rec.studentName} → ${rec.mentor}\nStatus: ${stLabel(rec.status)}\nMeet: ${lnk}\nSuggested: ${rec.suggestedTiming||'—'}\n\n`;
+    txt+=`STUDENT (${rec.studentEmail||'no email'}):\n${buildSEmailFromRec({...rec,meetLink:lnk},lnk,fbs)}\n\n`;
+    txt+=`MENTOR (${rec.mentorEmail||'no email'}):\n${buildMEmailFromRec({...rec,meetLink:lnk},lnk,fbm)}\n\n${'─'.repeat(50)}\n\n`;
+  });
+  navigator.clipboard.writeText(txt).then(()=>toast('All emails copied!'));
+}
+
+// ══════════════════════════════════════════════════════
+// EMAIL BUILDERS — from DB record (no sRow/mRow needed)
+// ══════════════════════════════════════════════════════
+function buildSEmailFromRec(rec,lnk,fbUrl){
+  const sFirst=(rec.studentName||'').split(' ')[0]||'there';
+  const mentorName=rec.mentor||'your mentor';
+  const mentorCollege=rec.mentorCollege||'';
+  const ms=parseMilestone(rec.mentorMilestone||'');
+  const suggestedTiming=rec.suggestedTiming||'';
+  const meetCode=lnk?lnk.replace('https://meet.google.com/','').trim():'[see link above]';
+  const fb=fbUrl?`\nAfter your session, please fill this quick feedback form:\n${fbUrl}\n`:'';
+  const timingLine=suggestedTiming?`\nSuggested time: ${suggestedTiming.split(',')[0].trim()} (to be confirmed by both of you)`:'';
+  const sEmail=rec.studentEmail||'this email address';
+
+  return `Hi ${sFirst},
+
+Great news — we have matched you with a Dhaaraa mentor! Here are your session details.
+
+━━━━━━━━━━━━━━━━━━━━━━━
+YOUR MENTOR
+━━━━━━━━━━━━━━━━━━━━━━━
+Name:     ${mentorName}
+College:  ${mentorCollege||'—'}
+Cleared:  ${ms.label||'—'}
+
+━━━━━━━━━━━━━━━━━━━━━━━
+SESSION DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━
+Available days: ${rec.overlapDays||'—'}
+Preferred time: ${rec.overlapTime||'—'}${timingLine}
+Meet link:      ${lnk||'[will be sent shortly]'}
+${fb}
+━━━━━━━━━━━━━━━━━━━━━━━
+HOW TO JOIN YOUR SESSION
+━━━━━━━━━━━━━━━━━━━━━━━
+You can join the Google Meet in any of these 3 ways:
+
+① VIA THIS EMAIL
+   Click the Meet link above directly from this email (${sEmail}).
+   If you are logged in to Gmail on this account, no login is needed —
+   just click and you will land in the meeting room.
+
+② VIA GOOGLE CALENDAR INVITE
+   You should receive a separate Google Calendar invite from Dhaaraa.
+   Open the calendar event and click the green "Join with Google Meet" button.
+   The link in the invite is identical to the one above.
+
+③ VIA GOOGLE MEET DIRECTLY
+   Open your browser and go to: https://meet.google.com
+   Click "Join a meeting" and enter this meeting code:
+   → ${meetCode}
+
+TROUBLESHOOTING
+   · Use Chrome or Safari for the best experience
+   · If you see "Ask to join" — click it; your mentor will admit you
+   · If your microphone is muted (crossed mic icon), click it once to unmute
+   · If there is any issue, refresh the page and try again
+   · Reply to this email if you need help
+${fb?'':''}
+━━━━━━━━━━━━━━━━━━━━━━━
+BEFORE YOUR SESSION
+━━━━━━━━━━━━━━━━━━━━━━━
+✦ Write 2–3 specific questions you want answered
+✦ Be on time — your mentor is volunteering their time
+✦ Be honest about where you are in your prep
+✦ Keep a notebook handy for notes and action points
+
+━━━━━━━━━━━━━━━━━━━━━━━
+⚠ IMPORTANT DISCLAIMER
+━━━━━━━━━━━━━━━━━━━━━━━
+The guidance you receive is based entirely on your mentor's
+personal JEE experience and is shared voluntarily.
+
+This is NOT official academic advice. Dhaaraa does not verify
+or take responsibility for information shared by mentors.
+Any decision you make is entirely your own.
+
+━━━━━━━━━━━━━━━━━━━━━━━
+Dhaaraa — voluntary JEE mentorship · VNIT '25 alumni
+Reply to this email for any questions.
+
+The Dhaaraa Team`;
+}
+
+function buildMEmailFromRec(rec,lnk,fbUrl){
+  const mFirst=(rec.mentor||'').split(' ')[0]||'there';
+  const sFirst=(rec.studentName||'').split(' ')[0]||'your mentee';
+  const suggestedTiming=rec.suggestedTiming||'';
+  const fb=fbUrl?`\nAfter the session, please fill this feedback form:\n${fbUrl}\n`:'';
+  const timingLine=suggestedTiming?`\nSuggested time: ${suggestedTiming.split(',')[0].trim()} (please confirm with your mentee)`:'';
+
+  return `Hi ${mFirst},
+
+You have been matched with a new Dhaaraa mentee. Thank you for volunteering!
+
+━━━━━━━━━━━━━━━━━━━━━━━
+ABOUT YOUR MENTEE
+━━━━━━━━━━━━━━━━━━━━━━━
+Name:              ${rec.studentName||'—'}
+Class / Year:      ${rec.studentClass||'—'}
+Available days:    ${rec.overlapDays||'—'}
+Preferred time:    ${rec.overlapTime||'—'}${timingLine}
+
+━━━━━━━━━━━━━━━━━━━━━━━
+SESSION DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━
+Meet link: ${lnk||'[will be sent shortly]'}
+${fb}
+━━━━━━━━━━━━━━━━━━━━━━━
+TIPS FOR A GOOD SESSION
+━━━━━━━━━━━━━━━━━━━━━━━
+✦ Ask them to walk you through their current situation first
+✦ Share specific examples from your JEE journey
+✦ End with 1–2 clear action points they can do this week
+
+━━━━━━━━━━━━━━━━━━━━━━━
+⚠ IMPORTANT — PLEASE READ
+━━━━━━━━━━━━━━━━━━━━━━━
+1. CONTACT BOUNDARIES — Do not share or ask for personal contact
+   details (phone, Instagram, etc.) outside this Dhaaraa session.
+   All communication must go through Dhaaraa only.
+
+2. SCOPE — Mentorship must stay focused on JEE prep, study strategy,
+   and exam guidance. Not personal matters.
+
+3. LIABILITY — Dhaaraa is not responsible for advice you share.
+   You may pause or stop at any time — just inform the Dhaaraa team.
+
+4. WELLBEING — If your mentee appears distressed beyond exam stress,
+   encourage them to speak to a trusted adult and let us know.
+
+━━━━━━━━━━━━━━━━━━━━━━━
+Thank you for giving your time — it matters more than you know.
+
+The Dhaaraa Team · VNIT '25 alumni`;
+}
+
+// ══════════════════════════════════════════════════════
+// ORIGINAL EMAIL BUILDERS (used during matching workflow, still needed)
+// ══════════════════════════════════════════════════════
+function buildSEmail(sRow,mRow,opt,lnk,fbUrl,sEmail){
+  const rec={
+    studentName:sc(sRow,'name'),studentClass:sc(sRow,'class_'),studentEmail:sEmail||sc(sRow,'email'),
+    mentor:mc(mRow,'name'),mentorCollege:mc(mRow,'college'),mentorEmail:mc(mRow,'email'),
+    mentorMilestone:mc(mRow,'cleared'),
+    overlapDays:opt.dayOv||'',overlapTime:opt.timeOv||'',
+    suggestedTiming:opt.timingSuggestions?.join(', ')||'',
+    meetLink:lnk||''
+  };
+  return buildSEmailFromRec(rec,lnk,fbUrl);
+}
+function buildMEmail(sRow,mRow,opt,lnk,fbUrl){
+  const rec={
+    studentName:sc(sRow,'name'),studentClass:sc(sRow,'class_'),
+    mentor:mc(mRow,'name'),mentorCollege:mc(mRow,'college'),
+    overlapDays:opt.dayOv||'',overlapTime:opt.timeOv||'',
+    suggestedTiming:opt.timingSuggestions?.join(', ')||'',
+    meetLink:lnk||''
+  };
+  return buildMEmailFromRec(rec,lnk,fbUrl);
+}
+
+// ══════════════════════════════
+// FEEDBACK
+// ══════════════════════════════
+async function processFeedback(){
+  if(!sFbRows.length&&!mFbRows.length){alert('Upload at least one feedback file first');return}
+  const recs=await getAllRecords();
+  let updated=0,skipped=0;
+  function findRec(sName,mName){
+    const sL=(sName||'').toLowerCase().trim(),mL=(mName||'').toLowerCase().trim();
+    let r=recs.find(r=>r.studentName?.toLowerCase().trim()===sL&&(!mL||r.mentor?.toLowerCase().trim()===mL));
+    if(r)return r;
+    const sFn=sL.split(' ')[0],mFn=mL.split(' ')[0];
+    return recs.find(r=>{const sm=sFn.length>=4?r.studentName?.toLowerCase().includes(sFn):r.studentName?.toLowerCase().trim()===sL;const mm=!mL||(mFn.length>=4?r.mentor?.toLowerCase().includes(mFn):r.mentor?.toLowerCase().trim()===mL);return sm&&mm});
+  }
+  for(const row of sFbRows){
+    const sName=sfc(row,'studentName'),mName=sfc(row,'mentorName');if(!sName)continue;
+    const rec=findRec(sName,mName);if(!rec){skipped++;continue}
+    const fb={sessionRating:parseInt(sfc(row,'sessionRating'))||null,mentorHelpful:sfc(row,'mentorHelpful'),explainedClearly:sfc(row,'explainedClearly'),comfortableAsking:sfc(row,'comfortableAsking'),mostUseful:sfc(row,'mostUseful'),wantAnotherSession:sfc(row,'wantAnotherSession'),dhaaraRating:parseInt(sfc(row,'dhaaraRating'))||null,suggestions:sfc(row,'suggestions')};
+    const existing=rec.studentFeedback||{};
+    const newData=Object.fromEntries(Object.entries(fb).filter(([,v])=>v!==null&&v!==''));
+    await dbPut('records',{...rec,studentFeedback:{...existing,...newData},status:rec.status==='matched'?'session_done':rec.status});updated++;
+  }
+  for(const row of mFbRows){
+    const mName=mfc(row,'mentorName'),sName=mfc(row,'studentName');if(!sName&&!mName)continue;
+    const recs2=await getAllRecords();
+    const rec=recs2.find(r=>{const sm=sName?r.studentName?.toLowerCase().includes(sName.toLowerCase().split(' ')[0]):true;const mm=mName?r.mentor?.toLowerCase().includes(mName.toLowerCase().split(' ')[0]):true;return sm&&mm});
+    if(!rec){skipped++;continue}
+    const fb={preparednessRating:parseInt(mfc(row,'preparednessRating'))||null,cameWithQuestions:mfc(row,'cameWithQuestions'),engagementRating:parseInt(mfc(row,'engagementRating'))||null,topicsCovered:mfc(row,'topicsCovered'),studentProgress:mfc(row,'studentProgress'),continueWithMentee:mfc(row,'continueWithMentee'),dhaaraRating:parseInt(mfc(row,'dhaaraRating'))||null,notes:mfc(row,'notes')};
+    const existing=rec.mentorFeedback||{};
+    const newData=Object.fromEntries(Object.entries(fb).filter(([,v])=>v!==null&&v!==''));
+    const hasBothFb=rec.studentFeedback&&Object.keys(rec.studentFeedback).length>0;
+    await dbPut('records',{...rec,mentorFeedback:{...existing,...newData},status:hasBothFb?'feedback_received':rec.status==='matched'?'session_done':rec.status});updated++;
+  }
+  refreshAll();
+  document.getElementById('fbResult').innerHTML=`<div class="alert alert-green" style="margin-top:12px"><span class="alert-icon">✓</span><div><strong>${updated} records updated</strong> with feedback.${skipped?' '+skipped+' rows could not be matched.':''}</div></div>`;
+  toast(`${updated} feedback records saved!`);
+}
+
+// ══════════════════════════════
+// PROFILES
+// ══════════════════════════════
+let profTab='students';
+function switchProfTab(t){
+  profTab=t;
+  document.getElementById('profTabS').className='btn btn-sm '+(t==='students'?'btn-primary':'btn-secondary');
+  document.getElementById('profTabM').className='btn btn-sm '+(t==='mentors'?'btn-primary':'btn-secondary');
+  renderProfiles();
+}
+async function clearProfiles(){if(!confirm('Clear all profile data?'))return;await dbClear('students');await dbClear('mentors');renderProfiles();toast('Profiles cleared')}
+async function renderProfiles(){
+  const q=(document.getElementById('profSearch')?.value||'').toLowerCase();
+  const el=document.getElementById('profContent');if(!el)return;
+  if(profTab==='students'){
+    let rows=await dbGetAll('students');
+    if(q)rows=rows.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.email||'').toLowerCase().includes(q)||(r.class_||'').toLowerCase().includes(q));
+    if(!rows.length){el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:16px 0">No student profiles yet.</div>';return}
+    el.innerHTML=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">${rows.length} students</div>
+    <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Class</th><th>Email</th><th>City</th><th>Stage</th><th>Challenge</th><th>Days</th><th>Time</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr>
+      <td style="color:var(--text3)">${i+1}</td><td style="font-weight:500">${r.name||'—'}</td>
+      <td style="color:var(--text3)">${r.class_||'—'}</td><td style="color:var(--text3);font-size:11px">${r.email||'—'}</td>
+      <td style="color:var(--text3)">${r.city||'—'}</td><td style="color:var(--text3)">${r.stage||'—'}</td>
+      <td style="color:var(--text2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(r.challenge||'—').slice(0,50)}${(r.challenge||'').length>50?'…':''}</td>
+      <td style="color:var(--blue)">${r.days||'—'}</td><td style="color:var(--text3);font-size:11px">${r.time||'—'}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+  }else{
+    let rows=await dbGetAll('mentors');
+    if(q)rows=rows.filter(r=>(r.name||'').toLowerCase().includes(q)||(r.email||'').toLowerCase().includes(q)||(r.college||'').toLowerCase().includes(q));
+    if(!rows.length){el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:16px 0">No mentor profiles yet.</div>';return}
+    el.innerHTML=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">${rows.length} mentors</div>
+    <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Email</th><th>College</th><th>Branch</th><th>Milestone</th><th>Areas</th><th>Days</th><th>Time</th><th>Capacity</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr>
+      <td style="color:var(--text3)">${i+1}</td><td style="font-weight:500">${r.name||'—'}</td>
+      <td style="color:var(--text3);font-size:11px">${r.email||'—'}</td><td>${r.college||'—'}</td><td style="color:var(--text3)">${r.branch||'—'}</td>
+      <td>${msBadgeInline(r.cleared||'')}</td>
+      <td style="color:var(--text2);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(r.areas||'—').slice(0,45)}${(r.areas||'').length>45?'…':''}</td>
+      <td style="color:var(--blue)">${r.days||'—'}</td><td style="color:var(--text3);font-size:11px">${r.time||'—'}</td><td style="color:var(--green)">${r.capacity||'—'}</td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+  }
+}
+
+// ══════════════════════════════
+// MENTOR LOAD
+// ══════════════════════════════
+async function renderMentorLoad(){
+  const recs=await getAllRecords();
+  const load={};
+  recs.filter(r=>r.mentor).forEach(r=>{
+    if(!load[r.mentor])load[r.mentor]={name:r.mentor,college:r.mentorCollege||'',milestone:r.mentorMilestone||'',total:0,sessions:0,ratings:[]};
+    load[r.mentor].total++;
+    if(['session_done','feedback_received','completed'].includes(r.status))load[r.mentor].sessions++;
+    if(r.studentFeedback?.sessionRating)load[r.mentor].ratings.push(r.studentFeedback.sessionRating);
+  });
+  const mentors=Object.values(load).sort((a,b)=>b.total-a.total);
+  const maxLoad=Math.max(...mentors.map(m=>m.total),1);
+  document.getElementById('mentorAnalysis').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${mentors.length}</div><div class="stat-label">Active mentors</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${mentors.filter(m=>m.total>=3).length}</div><div class="stat-label">At capacity (3+)</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--yellow)">${mentors.filter(m=>m.total>0&&m.sessions===0).length}</div><div class="stat-label">No session yet</div></div>
+    </div>
+    ${mentors.length?`<div class="card"><div class="card-title" style="margin-bottom:12px">Mentor overview</div>
+    ${mentors.map(m=>{const avg=m.ratings.length?m.ratings.reduce((a,b)=>a+b,0)/m.ratings.length:null;return`<div class="ml-row">
+      <div style="min-width:150px;flex-shrink:0">
+        <div class="ml-name">${m.name}</div>
+        <div style="font-size:11px;color:var(--text3)">${m.college}</div>
+        <div style="margin-top:2px">${msBadgeInline(m.milestone)}</div>
+      </div>
+      <div class="ml-bar-wrap">
+        <div class="ml-bar"><div class="ml-fill" style="width:${(m.total/maxLoad)*100}%"></div></div>
+        <div class="ml-meta">${m.total} assigned · ${m.sessions} sessions${avg?' · ⭐ '+avg.toFixed(1):''}</div>
+      </div>
+      <div style="font-size:13px;font-weight:500;color:${m.total>=3?'var(--orange)':'var(--green)'};min-width:22px;text-align:right">${m.total}</div>
+    </div>`}).join('')}
+    </div>`:'<div class="card" style="color:var(--text3);font-size:12px">No assignments yet.</div>'}`;
+}
+
+// ══════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════
+async function exportExcel(){
+  const recs=await getAllRecords();
+  if(!recs.length){alert('No records to export yet.');return}
+  const h=['ID','Student','Class','Email','Mentor','Mentor College','Mentor Email','Mentor Milestone','Match Score','Overlap Days','Overlap Time','Suggested Timing','Meet Link','Sessions','Date Matched','Session Date','Batch','Status','Notes','S.Rating','S.Want Another','S.Suggestions','M.Preparedness','M.Topics','M.Continue','M.Notes'];
+  const rows=recs.map(r=>{const sf=r.studentFeedback||{},mf=r.mentorFeedback||{};return[r.id,r.studentName,r.studentClass,r.studentEmail,r.mentor,r.mentorCollege,r.mentorEmail,r.mentorMilestone,r.matchScore,r.overlapDays,r.overlapTime,r.suggestedTiming||'',r.meetLink,r.sessionCount||1,r.dateMatched,r.sessionDate,r.batchName||'',r.status,r.notes,sf.sessionRating,sf.wantAnotherSession,sf.suggestions,mf.preparednessRating,mf.topicsCovered,mf.continueWithMentee,mf.notes]});
+  const ws=XLSX.utils.aoa_to_sheet([h,...rows]);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Records');
+  XLSX.writeFile(wb,`Dhaaraa_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
+  toast('Exported!');
+}
+function triggerImport(){document.getElementById('importFile').click()}
+async function importExcel(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'binary'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const data=XLSX.utils.sheet_to_json(ws,{raw:false,defval:''});
+      if(!data.length){toast('File empty',true);return}
+      let imp=0;
+      for(const row of data){
+        const sName=row['Student']||row['studentName']||'';if(!sName)continue;
+        const id=row['ID']||row['id']||'rec_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+        const existing=await dbGet('records',id);
+        await dbPut('records',{...(existing||{}),id,studentName:sName,studentClass:row['Class']||'',studentEmail:row['Email']||'',mentor:row['Mentor']||'',mentorCollege:row['Mentor College']||'',mentorEmail:row['Mentor Email']||'',mentorMilestone:row['Mentor Milestone']||'',matchScore:parseInt(row['Match Score'])||0,overlapDays:row['Overlap Days']||'',overlapTime:row['Overlap Time']||'',suggestedTiming:row['Suggested Timing']||'',meetLink:row['Meet Link']||'',sessionCount:parseInt(row['Sessions'])||1,dateMatched:row['Date Matched']||'',sessionDate:row['Session Date']||'',batchName:row['Batch']||'',status:row['Status']||'pending',notes:row['Notes']||'',studentFeedback:existing?.studentFeedback||{},mentorFeedback:existing?.mentorFeedback||{}});imp++;
+      }
+      refreshAll();toast(`${imp} records imported!`);
+    }catch(err){toast('Import failed: '+err.message,true)}
+  };
+  reader.readAsBinaryString(file);e.target.value='';
+}
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+initDB().then(async()=>{await loadSettings();renderDashboard();})
+  .catch(err=>{document.getElementById('dbSt').textContent='DB error';document.getElementById('dbSt').style.color='var(--orange)'});
+</script>
+</body>
+</html>
