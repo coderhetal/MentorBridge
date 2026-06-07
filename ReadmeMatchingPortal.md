@@ -1,7 +1,6 @@
 # MentorBridge — Mentor Matching Portal
 
 A browser-based admin tool that matches JEE aspirants with mentors using a custom scoring algorithm. No backend. No setup. Open and use.
-
 ---
 
 ## How it works
