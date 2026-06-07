@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="MentorBridge — Free JEE mentorship by IIT & NIT seniors. Connecting 11th & 12th students with verified IIT/NIT alumni for honest, one-on-one guidance."/>
+  <meta name="theme-color" content="#0C0A08"/>
+
+  
+  <meta property="og:title" content="MentorBridge — JEE Mentorship by IIT & NIT Seniors"/>
+  <meta property="og:description" content="Free, personal JEE mentorship from seniors who cracked it. Started by VNIT '25 alumni."/>
+  <meta property="og:type" content="website"/>
+
+  <title>MentorBridge— JEE Mentorship by IIT & NIT Seniors</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ─── Reset & Tokens ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --org:    #E8572A;
+      --org-l:  #FF7A4D;
+      --dk:     #0C0A08;
+      --dk2:    #161310;
+      --mid:    #7A756F;
+      --lt:     #F7F4F0;
+      --wh:     #FDFCFB;
+      --serif:  'Sora', system-ui, sans-serif;
+      --sans:   'Inter', system-ui, sans-serif;
+      --r:      16px;
+      --rl:     24px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--wh);
+      color: var(--dk);
+      overflow-x: hidden;
+    }
+
+    /* ─── Navigation ─────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw; height: 64px;
+      background: rgba(253,252,251,0.93);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+    }
+    .logo {
+      font-family: var(--serif); font-size: 20px;
+      color: var(--dk); text-decoration: none;
+      font-weight: 700; letter-spacing: -.5px;
+    }
+    .logo span { color: var(--org); }
+
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      font-size: 14px; font-weight: 400; color: var(--mid);
+      text-decoration: none; padding: 7px 14px;
+      border-radius: 100px; transition: all .2s;
+    }
+    .nav-link:hover { color: var(--dk); background: rgba(0,0,0,0.05); }
+    .nav-btn {
+      font-size: 14px; font-weight: 600; color: var(--wh);
+      background: var(--org); padding: 8px 20px;
+      border-radius: 100px; text-decoration: none; transition: all .2s;
+    }
+    .nav-btn:hover { background: var(--org-l); transform: translateY(-1px); }
+
+    /* Hamburger (mobile) */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 8px; border: none; background: none;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--dk); border-radius: 2px;
+    }
+    .mobile-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      background: var(--wh); border-bottom: 1px solid rgba(0,0,0,0.08);
+      padding: 16px 5vw 24px; flex-direction: column; gap: 4px; z-index: 199;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 15px; font-weight: 400; color: var(--dk);
+      text-decoration: none; padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ─── Hero ───────────────────────────────────────────── */
+    .hero {
+      min-height: 100svh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 100px 5vw 80px;
+      background: var(--dk); position: relative; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 110%, rgba(232,87,42,.18) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 30% at 15% 15%,  rgba(232,87,42,.06) 0%, transparent 60%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(232,87,42,.12); border: 1px solid rgba(232,87,42,.28);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 12px; font-weight: 500; color: var(--org-l);
+      margin-bottom: 32px; letter-spacing: .01em;
+      animation: popIn .5s ease both;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; background: var(--org);
+      border-radius: 50%; animation: blink 2s infinite;
+    }
+
+    /* Keyframes */
+    @keyframes blink    { 0%,100%{opacity:1} 50%{opacity:.3} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+    @keyframes slideInL { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:none} }
+    @keyframes slideInR { from{opacity:0;transform:translateX(24px)}  to{opacity:1;transform:none} }
+    @keyframes popIn    { 0%{opacity:0;transform:scale(.93)} 100%{opacity:1;transform:scale(1)} }
+    @keyframes shimmer  { 0%,100%{opacity:1;color:var(--org)} 50%{opacity:.7;color:var(--org-l)} }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(30px, 5.5vw, 64px);
+      line-height: 1.15; letter-spacing: -1px;
+      color: var(--wh); max-width: 720px;
+      margin-bottom: 20px; font-weight: 700;
+      animation: fadeUp .6s .1s ease both;
+    }
+    .hero h1 em {
+      font-style: normal; color: var(--org); font-weight: 700;
+      display: inline-block;
+      animation: shimmer 3s 1s ease-in-out infinite;
+    }
+    .hero-sub {
+      font-size: clamp(14px, 1.8vw, 17px); font-weight: 300;
+      color: rgba(255,255,255,.5); max-width: 480px;
+      line-height: 1.75; margin-bottom: 44px;
+      animation: slideInL .6s .25s ease both;
+    }
+    .hero-btns {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      animation: slideInR .6s .35s ease both;
+    }
+    .btn-org {
+      background: var(--org); color: var(--wh);
+      padding: 13px 28px; border-radius: 100px;
+      font-size: 14px; font-weight: 600;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: all .2s; display: inline-block; letter-spacing: .01em;
+    }
+    .btn-org:hover {
+      background: var(--org-l); transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,87,42,.3);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,.06); color: rgba(255,255,255,.8);
+      padding: 13px 28px; border-radius: 100px;
+      font-size: 14px; font-weight: 400;
+      text-decoration: none; border: 1px solid rgba(255,255,255,.14);
+      transition: all .2s; display: inline-block;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.11); transform: translateY(-2px); }
+    .hero-note {
+      margin-top: 48px; font-size: 13px; color: rgba(255,255,255,.65);
+      letter-spacing: .03em; animation: fadeUp .6s .5s ease both;
+    }
+
+    /* ─── Shared Section Styles ──────────────────────────── */
+    section { padding: 80px 5vw; }
+    .container { max-width: 1060px; margin: 0 auto; }
+
+    .s-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--org); margin-bottom: 14px; font-family: var(--sans);
+    }
+    .s-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.15; letter-spacing: -.5px;
+      margin-bottom: 16px; font-weight: 700;
+    }
+    .s-title em { font-style: normal; color: var(--org); }
+    .s-sub {
+      font-size: 16px; font-weight: 300; color: var(--mid);
+      line-height: 1.75; max-width: 480px; font-family: var(--sans);
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+    .reveal.on { opacity: 1; transform: none; }
+
+    /* ─── How It Works ───────────────────────────────────── */
+    .how { background: var(--lt); }
+    .steps {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 20px; margin-top: 52px;
+    }
+    .step {
+      background: var(--wh); border-radius: var(--rl); padding: 36px 28px;
+      border: 1px solid rgba(0,0,0,.07);
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .step::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--org), var(--org-l));
+      transform: scaleX(0); transform-origin: left; transition: transform .35s ease;
+    }
+    .step:hover {
+      border-color: rgba(232,87,42,.2);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(232,87,42,.1);
+    }
+    .step:hover::after { transform: scaleX(1); }
+    .step-num {
+      font-family: var(--serif); font-size: 44px;
+      color: rgba(232,87,42,.75); line-height: 1;
+      margin-bottom: 20px; font-weight: 700;
+    }
+    .step h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; font-family: var(--serif); }
+    .step p  { font-size: 15px; color: var(--mid); line-height: 1.7; font-family: var(--sans); }
+
+    /* ─── Mentor Directory ───────────────────────────────── */
+    .mentors-section { background: var(--wh); }
+    .mentors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px,1fr));
+      gap: 20px; margin-top: 48px;
+    }
+
+    /* Search bar */
+    .mentor-search-wrap { margin-top: 36px; margin-bottom: 32px; }
+    .mentor-search-bar {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--wh); border: 1.5px solid rgba(0,0,0,.1);
+      border-radius: 100px; padding: 10px 20px;
+      transition: border-color .2s;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .mentor-search-bar:focus-within {
+      border-color: var(--org);
+      box-shadow: 0 2px 20px rgba(232,87,42,.11);
+    }
+    .mentor-search-bar input {
+      flex: 1; border: none; outline: none;
+      font-family: var(--sans); font-size: 15px;
+      color: var(--dk); background: transparent;
+    }
+    .mentor-search-bar input::placeholder { color: var(--mid); }
+    .search-icon { font-size: 16px; color: var(--mid); flex-shrink: 0; }
+    .search-clear {
+      font-size: 12px; font-weight: 500; color: var(--mid);
+      cursor: pointer; padding: 3px 9px; border-radius: 100px;
+      border: none; background: rgba(0,0,0,.06);
+      font-family: var(--sans); display: none; transition: all .2s;
+    }
+    .search-clear:hover { background: rgba(0,0,0,.11); color: var(--dk); }
+    .search-clear.show { display: inline-block; }
+
+    /* Filter chips */
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .fchip {
+      font-size: 12px; font-weight: 500; padding: 5px 14px;
+      border-radius: 100px; background: transparent;
+      color: var(--mid); border: 1.5px solid rgba(0,0,0,.1);
+      cursor: pointer; font-family: var(--sans);
+      transition: all .2s; white-space: nowrap;
+    }
+    .fchip:hover { border-color: var(--org); color: var(--org); }
+    .fchip.on    { background: var(--org); color: var(--wh); border-color: var(--org); }
+
+    .m-count { font-size: 13px; color: var(--mid); margin-top: 18px; min-height: 20px; font-family: var(--sans); }
+    .m-empty { text-align: center; padding: 52px 24px; color: var(--mid); font-family: var(--sans); grid-column: 1/-1; }
+    .m-empty h3 { font-size: 18px; font-weight: 600; color: var(--dk); margin-bottom: 8px; font-family: var(--serif); }
+    .m-empty p  { font-size: 14px; line-height: 1.6; }
+
+    /* Mentor card */
+    .mentor-card {
+      background: var(--wh); border-radius: var(--rl); padding: 28px 24px;
+      border: 1px solid rgba(0,0,0,.08);
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+      position: relative; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .mentor-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--org), var(--org-l));
+      transform: scaleX(0); transform-origin: left; transition: transform .35s ease;
+    }
+    .mentor-card:hover {
+      border-color: rgba(232,87,42,.2);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.09);
+    }
+    .mentor-card:hover::before { transform: scaleX(1); }
+
+    .mentor-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .mentor-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 16px; font-weight: 700;
+      color: var(--wh); flex-shrink: 0; transition: transform .3s;
+    }
+    .mentor-card:hover .mentor-avatar { transform: scale(1.08); }
+    .mentor-name    { font-size: 15px; font-weight: 600; color: var(--dk); margin-bottom: 2px; font-family: var(--serif); }
+    .mentor-college { font-size: 12px; color: var(--mid); font-family: var(--sans); line-height: 1.4; }
+
+    .mentor-badge {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 100px;
+      margin-bottom: 12px; align-self: flex-start;
+    }
+    .badge-alumni  { background: rgba(232,87,42,.1);  color: var(--org);    border: 1px solid rgba(232,87,42,.2); }
+    .badge-student { background: rgba(30,130,220,.1); color: #1E82DC;       border: 1px solid rgba(30,130,220,.2); }
+
+    .mentor-divider { height: 1px; background: rgba(0,0,0,.06); margin: 10px 0; }
+    .mentor-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      margin-bottom: 8px; font-size: 13px; color: var(--mid);
+      font-family: var(--sans); line-height: 1.5;
+    }
+    .mentor-row:last-child { margin-bottom: 0; }
+    .mentor-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+    .mentor-areas { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+    .area-tag {
+      font-size: 11px; font-weight: 500; padding: 3px 9px;
+      border-radius: 100px; background: var(--lt); color: var(--mid);
+      border: 1px solid rgba(0,0,0,.08); font-family: var(--sans);
+    }
+    .area-tag.match { background: rgba(232,87,42,.1); color: var(--org); border-color: rgba(232,87,42,.25); }
+
+    /* ─── About ──────────────────────────────────────────── */
+    .about { background: var(--dk); color: var(--wh); }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: start; margin-top: 52px;
+    }
+    .about p { font-size: 16px; color: rgba(255,255,255,.55); line-height: 1.85; margin-bottom: 18px; font-family: var(--sans); }
+    .about p strong { color: var(--wh); font-weight: 500; }
+    .about-pull {
+      font-family: var(--serif); font-size: 19px; font-weight: 600;
+      color: rgba(255,255,255,.85); line-height: 1.6;
+      padding: 28px; background: rgba(255,255,255,.04);
+      border-radius: var(--r); border-left: 3px solid var(--org);
+      margin-top: 8px; margin-bottom: 20px;
+    }
+    .about-note {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 20px 22px; background: rgba(255,255,255,.04);
+      border-radius: var(--r); border: 1px solid rgba(255,255,255,.08);
+      margin-top: 4px;
+    }
+    .about-note-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+    .about-note p { font-size: 14px; color: rgba(255,255,255,.45); line-height: 1.7; margin: 0; }
+
+    .about-facts { display: flex; flex-direction: column; gap: 14px; }
+    .fact {
+      padding: 22px 24px; background: rgba(255,255,255,.04);
+      border-radius: var(--r); border: 1px solid rgba(255,255,255,.07);
+      transition: background .3s, border-color .3s;
+    }
+    .fact:hover { background: rgba(255,255,255,.07); border-color: rgba(232,87,42,.2); }
+    .fact h4 {
+      font-size: 11px; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--org); margin-bottom: 8px; font-family: var(--sans);
+    }
+    .fact p { font-size: 15px; color: rgba(255,255,255,.5); line-height: 1.65; margin: 0; font-family: var(--sans); }
+
+    /* ─── Student Form ───────────────────────────────────── */
+    .form-section { background: var(--lt); }
+    .form-wrap { max-width: 520px; margin: 52px auto 0; text-align: center; }
+    .form-card {
+      background: var(--wh); border-radius: var(--rl); padding: 44px 40px;
+      border: 1px solid rgba(0,0,0,.08); text-align: left;
+      transition: box-shadow .3s;
+    }
+    .form-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,.08); }
+    .form-card h3 { font-family: var(--serif); font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .fc-sub { font-size: 14px; color: var(--mid); margin-bottom: 28px; line-height: 1.6; font-family: var(--sans); }
+    .gform-btn {
+      display: block; width: 100%; padding: 15px 30px; border-radius: 100px;
+      background: var(--org); color: var(--wh);
+      font-family: var(--sans); font-size: 15px; font-weight: 600;
+      text-decoration: none; text-align: center;
+      transition: all .25s; border: none; cursor: pointer; letter-spacing: .01em;
+    }
+    .gform-btn:hover {
+      background: var(--org-l); transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,87,42,.25);
+    }
+    .form-note { margin-top: 14px; font-size: 13px; color: var(--mid); text-align: center; line-height: 1.6; font-family: var(--sans); }
+
+    /* ─── Footer ─────────────────────────────────────────── */
+    footer {
+      background: var(--dk2); border-top: 1px solid rgba(255,255,255,.06);
+      padding: 36px 5vw; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .f-logo { font-family: var(--serif); font-size: 18px; color: var(--wh); text-decoration: none; font-weight: 700; letter-spacing: -.3px; }
+    .f-logo span { color: var(--org); }
+    footer p { font-size: 13px; color: rgba(255,255,255,.4); font-family: var(--sans); }
+    .f-links { display: flex; gap: 20px; list-style: none; }
+    .f-links a { font-size: 13px; color: rgba(255,255,255,.4); text-decoration: none; transition: color .2s; font-family: var(--sans); }
+    .f-links a:hover { color: var(--wh); }
+
+    /* ─── Responsive ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-link, .nav-btn { display: none; }
+      .hamburger { display: flex; }
+      .steps { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; gap: 32px; }
+      footer { flex-direction: column; text-align: center; }
+      .f-links { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 28px; letter-spacing: -.5px; }
+      .hero-btns { flex-direction: column; align-items: stretch; }
+      .btn-org, .btn-ghost { text-align: center; }
+      .form-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ─────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="logo">Dhaar<span>aa</span></a>
+  <div class="nav-right">
+    <a href="#mentors" class="nav-link">Our Mentors</a>
+    <a href="#how"     class="nav-link">How it works</a>
+    <a href="#about"   class="nav-link">About</a>
+    <a href="#join"    class="nav-btn">Get a mentor</a>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#mentors" onclick="closeMenu()">Our Mentors</a>
+  <a href="#how"     onclick="closeMenu()">How it works</a>
+  <a href="#about"   onclick="closeMenu()">About</a>
+  <a href="#join"    onclick="closeMenu()">Get a mentor</a>
+</div>
+
+<!-- ── Hero ───────────────────────────────────────────────── -->
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    A voluntary social initiative by VNIT '25 Alumni
+  </div>
+  <h1>JEE guidance from seniors who <em>cracked it.</em></h1>
+  <p class="hero-sub">
+    Connecting 11th &amp; 12th students with IIT and NIT seniors for honest,
+    one-on-one mentorship. Real talk from people who've been exactly where you are.
+  </p>
+  <div class="hero-btns">
+    <a href="#join"    class="btn-org">Get a mentor →</a>
+    <a href="#mentors" class="btn-ghost">Meet our mentors</a>
+  </div>
+  <p class="hero-note">IIT &amp; NIT mentors only &nbsp;·&nbsp; Personally matched &nbsp;·&nbsp; No fees</p>
+</section>
+
+<!-- ── How It Works ───────────────────────────────────────── -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="reveal">
+      <p class="s-label">How it works</p>
+      <h2 class="s-title">Three steps to your <em>right mentor.</em></h2>
+      <p class="s-sub">Simple and personal. No downloads, no subscriptions.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Fill the form</h3>
+        <p>Tell us your class, JEE target, biggest challenge and availability. Takes under 3 minutes.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>We match you</h3>
+        <p>We personally review your form and pair you with an IIT or NIT senior who went through the same journey.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Have the conversation</h3>
+        <p>Connect on a call. Ask everything — strategy, what works, what doesn't, and what actually matters for JEE.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Mentor Directory ────────────────────────────────────── -->
+<section class="mentors-section" id="mentors">
+  <div class="container">
+    <div class="reveal">
+      <p class="s-label">Our mentors</p>
+      <h2 class="s-title">Meet the seniors who'll <em>guide you.</em></h2>
+      <p class="s-sub">IIT and NIT students and alumni who cracked JEE and volunteer their time to guide the next batch.</p>
+    </div>
+
+    <div class="mentor-search-wrap reveal">
+      <div class="mentor-search-bar">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="mentorSearch"
+          placeholder="Search by name, college, branch, area or day — e.g. IIT, mock tests, Saturday…"
+          oninput="filterMentors()"
+          aria-label="Search mentors"
+        />
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">✕ Clear</button>
+      </div>
+      <div class="filter-chips" id="filterChips"></div>
+      <div class="m-count" id="mentorCount" aria-live="polite"></div>
+    </div>
+
+    <div class="mentors-grid" id="mentorsGrid"></div>
+  </div>
+</section>
+
+<!-- ── About ──────────────────────────────────────────────── -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="reveal">
+      <p class="s-label" style="color:var(--org)">About MentorBridge</p>
+      <h2 class="s-title" style="color:var(--wh)">Started by VNIT alumni. <em>Built for every junior.</em></h2>
+    </div>
+    <div class="about-grid reveal">
+      <div>
+        <p>We graduated from <strong>NIT Nagpur in 2025</strong> and looked back at our own JEE journey. The thing that made the real difference wasn't the resources — it was <strong>that one senior who said, "bhai ye mat karo, ye karo."</strong></p>
+        <p>Most 11th and 12th students preparing for JEE never get that conversation. They have material, but no clarity. Effort, but no direction. <strong>We built MentorBridge to change that.</strong></p>
+        <p>We're starting small, staying personal, and making sure every student gets <strong>a mentor who's actually been through their exact situation.</strong> Our mentors volunteer their time — there's no commercial interest behind this platform.</p>
+        <div class="about-pull">
+          The best guidance comes from someone who remembers what it felt like to not know the answer.
+        </div>
+        <div class="about-note">
+          <span class="about-note-icon">🌐</span>
+          <p>MentorBridge is an independent, non-commercial mentorship initiative. All mentors contribute voluntarily in their personal capacity. This platform is not affiliated with any organisation, institution, or employer.</p>
+        </div>
+      </div>
+      <div class="about-facts">
+        <div class="fact">
+          <h4>Who we are</h4>
+          <p>VNIT Nagpur '25 alumni — engineers who remember the JEE journey and want to make it easier for the next batch.</p>
+        </div>
+        <div class="fact">
+          <h4>Who this is for</h4>
+          <p>Class 11 and Class 12 students preparing for JEE Main and Advanced — whether your goal is IIT, NIT, or GFTI.</p>
+        </div>
+        <div class="fact">
+          <h4>Our mentors</h4>
+          <p>Only verified IIT and NIT students and alumni. Every mentor on MentorBridge is someone we personally know and trust.</p>
+        </div>
+        <div class="fact">
+          <h4>No fees, ever</h4>
+          <p>MentorBridge is a voluntary social initiative. No registration fees, no session charges, no hidden costs — for any student.</p>
+        </div>
+        <div class="fact">
+          <h4>Our promise</h4>
+          <p>Every form is personally reviewed. You'll hear back within 3 days. Your first session will be scheduled within a week of matching.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Student Registration ────────────────────────────────── -->
+<section class="form-section" id="join">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <p class="s-label" style="display:flex;justify-content:center">Get started</p>
+      <h2 class="s-title" style="text-align:center">Tell us about yourself. <em>We'll find your match.</em></h2>
+      <p class="s-sub" style="margin:0 auto;text-align:center;max-width:420px">
+        Fill the form and we'll personally reach out within 3 days with your mentor match.
+      </p>
+    </div>
+    <div class="form-wrap reveal">
+      <div class="form-card">
+        <h3>Student registration</h3>
+        <p class="fc-sub">For 11th &amp; 12th grade JEE aspirants · No fees involved</p>
+        <!-- Replace the href below with your actual Google Form link -->
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLSeo2oHkPjCFJUk2SI9BGFTpTHBDpgrzd2uwIGUq2U7v7PoSow/viewform"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="gform-btn"
+        >
+          Register as a student →
+        </a>
+        <p class="form-note">Opens in a new tab · Takes ~3 minutes · We'll WhatsApp you within 3 days</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────── -->
+<footer>
+  <a href="#" class="f-logo">Dhaar<span>aa</span></a>
+  <p>Started by VNIT '25 alumni · For JEE aspirants · Not affiliated with any institution</p>
+  <ul class="f-links">
+    <li><a href="#mentors">Mentors</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#join">Get a mentor</a></li>
+  </ul>
+</footer>
+
+<script>
+  // ─────────────────────────────────────────────────────────
+  // MENTOR DATA
+  // To add a new mentor, copy one object and fill in the fields.
+  // status: "alumni" or "student"
+  // year:   only for students, e.g. "2nd year" (leave "" for alumni)
+  // areas:  array of strings — shown as filter chips automatically
+  // color:  avatar background hex
+  // ─────────────────────────────────────────────────────────
+  const MENTORS = [
+    {
+      name: "Hrishita ",
+      status: "alumni", year: "",
+      college: "NITK Surathkal",
+      branch: "CSE",
+      days: "Saturday, Sunday",
+      areas: ["Motivation & guidance", "College selection advice", "Journey insights"],
+      color: "#E8572A"
+    },
+    {
+      name: "Amogh",
+      status: "alumni", year: "",
+      college: "VNIT Nagpur",
+      branch: "Electronics & Communication Engineering",
+      days: "Saturday, Sunday",
+      areas: ["Study strategy", "Motivation & guidance", "Journey insights"],
+      color: "#1E82DC"
+    },
+    {
+      name: "Anjali ",
+      status: "student", year: "1st year",
+      college: "VNIT → IIM Bangalore",
+      branch: "Mechanical Engineering",
+      days: "Monday",
+      areas: ["Motivation & guidance", "Journey insights"],
+      color: "#C45020"
+    },
+    {
+      name: "Hetal",
+      status: "alumni", year: "",
+      college: "NIT Nagpur",
+      branch: "ECE",
+      days: "Saturday, Sunday",
+      areas: ["Study strategy", "Motivation & guidance", "College selection", "Mock test analysis", "Resource guidance"],
+      color: "#E8572A"
+    },
+    {
+      name: "Nitish ",
+      status: "alumni", year: "",
+      college: "VNIT Nagpur",
+      branch: "ECE",
+      days: "Saturday, Sunday",
+      areas: ["Study strategy", "Motivation & guidance", "College selection", "Mock test analysis", "Resource guidance"],
+      color: "#1873C4"
+    },
+    {
+      name: "Netra ",
+      status: "alumni", year: "",
+      college: "VNIT Nagpur",
+      branch: "CSE",
+      days: "Saturday, Sunday",
+      areas: ["Mock test analysis"],
+      color: "#E8572A"
+    },
+    {
+      name: "Mukund ",
+      status: "student", year: "1st year",
+      college: "VNIT Nagpur",
+      branch: "ECE",
+      days: "Thursday, Sunday",
+      areas: ["Study strategy", "Journey insights", "Mock test analysis", "Resource guidance"],
+      color: "#1E82DC"
+    },
+    {
+      name: "Yash ",
+      status: "student", year: "2nd year",
+      college: "VNIT Nagpur",
+      branch: "Electrical & Electronics Engineering",
+      days: "Saturday, Sunday",
+      areas: ["Study strategy", "Journey insights", "Resource guidance"],
+      color: "#C45020"
+    },
+    {
+      name: "Nakul Alawadhi",
+      status: "alumni", year: "",
+      college: "IIT Ropar",
+      branch: "Computer Science & Engineering",
+      days: "Saturday, Sunday",
+      areas: ["Study strategy", "Motivation & guidance", "College selection", "Mock test analysis", "Resource guidance"],
+      color: "#E8572A"
+    },
+    {
+      name: "Chaitanya Wakodkar",
+      status: "alumni", year: "",
+      college: "NIT Warangal",
+      branch: "Electrical & Electronics Engineering",
+      days: "Saturday, Sunday",
+      areas: ["Study strategy", "Mock test analysis"],
+      color: "#1E82DC"
+    }
+  ];
+
+  // ─────────────────────────────────────────────────────────
+  // UTILITIES
+  // ─────────────────────────────────────────────────────────
+
+  /** Returns up to 2 uppercase initials from a full name */
+  function getInitials(name) {
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  /** Collect all unique area tags across all mentors (sorted) */
+  const ALL_TAGS = [...new Set(MENTORS.flatMap(m => m.areas))].sort();
+
+  /** Currently active chip filters */
+  let activeChips = new Set();
+
+  // ─────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────
+
+  function buildFilterChips() {
+    const wrap = document.getElementById('filterChips');
+    wrap.innerHTML = ALL_TAGS.map(tag =>
+      `<button class="fchip" onclick="toggleChip(this, '${tag.replace(/'/g, "\\'")}')">${tag}</button>`
+    ).join('');
+  }
+
+  function renderMentors() {
+    const grid = document.getElementById('mentorsGrid');
+    grid.innerHTML = MENTORS.map((m, i) => `
+      <div class="mentor-card"
+        data-name="${m.name}"
+        data-college="${m.college}"
+        data-branch="${m.branch}"
+        data-areas='${JSON.stringify(m.areas)}'
+        data-days="${m.days}"
+        data-year="${m.year || ''}"
+        data-status="${m.status}"
+        style="animation-delay:${i * 60}ms"
+      >
+        <div class="mentor-top">
+          <div class="mentor-avatar" style="background:${m.color}">${getInitials(m.name)}</div>
+          <div>
+            <div class="mentor-name">${m.name}</div>
+            <div class="mentor-college">${m.college}</div>
+          </div>
+        </div>
+
+        <span class="mentor-badge ${m.status === 'alumni' ? 'badge-alumni' : 'badge-student'}">
+          ${m.status === 'alumni' ? 'Alumni' : m.year}
+        </span>
+
+        <div class="mentor-divider"></div>
+
+        <div class="mentor-row"><span class="mentor-icon">🎓</span><span>${m.branch}</span></div>
+        <div class="mentor-row"><span class="mentor-icon">📅</span><span>${m.days}</span></div>
+
+        <div class="mentor-areas">
+          ${m.areas.map(a => `<span class="area-tag">${a}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // FILTER LOGIC
+  // ─────────────────────────────────────────────────────────
+
+  function toggleChip(el, tag) {
+    if (activeChips.has(tag)) {
+      activeChips.delete(tag);
+      el.classList.remove('on');
+    } else {
+      activeChips.add(tag);
+      el.classList.add('on');
+    }
+    filterMentors();
+  }
+
+  function clearSearch() {
+    document.getElementById('mentorSearch').value = '';
+    activeChips.clear();
+    document.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+    document.getElementById('searchClear').classList.remove('show');
+    filterMentors();
+  }
+
+  function filterMentors() {
+    const query    = document.getElementById('mentorSearch').value.toLowerCase().trim();
+    const clearBtn = document.getElementById('searchClear');
+    clearBtn.classList.toggle('show', query.length > 0 || activeChips.size > 0);
+
+    const cards = document.querySelectorAll('.mentor-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+      const name      = (card.dataset.name    || '').toLowerCase();
+      const college   = (card.dataset.college || '').toLowerCase();
+      const branch    = (card.dataset.branch  || '').toLowerCase();
+      const days      = (card.dataset.days    || '').toLowerCase();
+      const year      = (card.dataset.year    || '').toLowerCase();
+      const status    = (card.dataset.status  || '').toLowerCase();
+      const areas     = JSON.parse(card.dataset.areas || '[]');
+      const areasText = areas.join(' ').toLowerCase();
+
+      const matchesQuery = !query ||
+        name.includes(query)      ||
+        college.includes(query)   ||
+        branch.includes(query)    ||
+        areasText.includes(query) ||
+        days.includes(query)      ||
+        year.includes(query)      ||
+        status.includes(query);
+
+      const matchesChips = activeChips.size === 0 ||
+        [...activeChips].every(chip => areas.includes(chip));
+
+      if (matchesQuery && matchesChips) {
+        card.style.display = '';
+        visible++;
+        // Highlight matching tags
+        card.querySelectorAll('.area-tag').forEach(tag => {
+          const isMatch =
+            (query && tag.textContent.toLowerCase().includes(query)) ||
+            activeChips.has(tag.textContent);
+          tag.classList.toggle('match', isMatch);
+        });
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update count / empty state
+    const countEl = document.getElementById('mentorCount');
+    const grid    = document.getElementById('mentorsGrid');
+    const existing = grid.querySelector('.m-empty');
+    if (existing) existing.remove();
+
+    if (visible === 0) {
+      countEl.textContent = '';
+      grid.insertAdjacentHTML('beforeend', `
+        <div class="m-empty">
+          <h3>No mentors found</h3>
+          <p>Try a different search term or remove some filters.<br/>
+             You can always fill the form and we'll match you personally.</p>
+        </div>
+      `);
+    } else {
+      countEl.textContent = visible === MENTORS.length
+        ? `Showing all ${MENTORS.length} mentors`
+        : `${visible} of ${MENTORS.length} mentors match`;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // SCROLL REVEAL
+  // ─────────────────────────────────────────────────────────
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('on'), i * 120);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ─────────────────────────────────────────────────────────
+  // MOBILE MENU
+  // ─────────────────────────────────────────────────────────
+  function toggleMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+  function closeMenu()  { document.getElementById('mobileMenu').classList.remove('open'); }
+
+  // Close menu when clicking outside nav
+  document.addEventListener('click', e => {
+    if (!e.target.closest('nav') && !e.target.closest('#mobileMenu')) closeMenu();
+  });
+
+  // ─────────────────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────────────────
+  buildFilterChips();
+  renderMentors();
+  filterMentors(); // set initial count label
+</script>
+</body>
+</html>
